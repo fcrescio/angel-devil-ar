@@ -12,6 +12,9 @@ object AndroidArAvailabilityChecker {
             -> ArAvailabilityState.NeedsInstall
             ArCoreApk.Availability.UNSUPPORTED_DEVICE_NOT_CAPABLE -> ArAvailabilityState.Unsupported
             ArCoreApk.Availability.UNKNOWN_CHECKING -> ArAvailabilityState.Checking
+            ArCoreApk.Availability.UNKNOWN_ERROR,
+            ArCoreApk.Availability.UNKNOWN_TIMED_OUT,
+            -> ArAvailabilityState.Unknown
         }
     }
 }
