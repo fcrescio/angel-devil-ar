@@ -4,7 +4,9 @@ import android.Manifest
 import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -20,9 +22,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.angelmirror.ar.AndroidArAvailabilityChecker
+import com.angelmirror.ar.ArHostView
+import com.angelmirror.ar.ArSessionStatus
 import com.angelmirror.ar.ArAvailabilityState
 import com.angelmirror.permissions.CameraPermissionChecker
 import com.angelmirror.permissions.CameraPermissionState
@@ -45,6 +50,9 @@ private fun ReadinessScreen() {
     var arAvailability by remember {
         mutableStateOf(AndroidArAvailabilityChecker.check(context))
     }
+    var arSessionStatus by remember {
+        mutableStateOf<ArSessionStatus>(ArSessionStatus.NotStarted)
+    }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -59,6 +67,19 @@ private fun ReadinessScreen() {
     LaunchedEffect(context) {
         cameraPermission = CameraPermissionChecker.check(context)
         arAvailability = AndroidArAvailabilityChecker.check(context)
+    }
+
+    val isReadyForAr = cameraPermission == CameraPermissionState.Granted &&
+        arAvailability == ArAvailabilityState.Ready
+
+    if (isReadyForAr) {
+        ArExperienceScreen(
+            status = arSessionStatus,
+            onStatusChanged = {
+                arSessionStatus = it
+            },
+        )
+        return
     }
 
     Column(
@@ -85,6 +106,28 @@ private fun ReadinessScreen() {
                 Text(text = "Allow camera")
             }
         }
+    }
+}
+
+@Composable
+private fun ArExperienceScreen(
+    status: ArSessionStatus,
+    onStatusChanged: (ArSessionStatus) -> Unit,
+) {
+    Box(modifier = Modifier.fillMaxSize()) {
+        ArHostView(
+            modifier = Modifier.fillMaxSize(),
+            onStatusChanged = onStatusChanged,
+        )
+        Text(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .background(Color.Black.copy(alpha = 0.56f))
+                .padding(16.dp),
+            text = status.message,
+            color = Color.White,
+            style = MaterialTheme.typography.bodyMedium,
+        )
     }
 }
 

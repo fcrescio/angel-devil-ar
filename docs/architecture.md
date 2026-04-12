@@ -33,7 +33,10 @@ New runtime dependencies require a backlog task and, when they affect architectu
 
 ## Open Points
 
-- Exact SceneView API surface for the first AR screen.
 - Initial GLB placeholder asset source.
 - Smoothing algorithm and offset defaults.
 - Device support policy for non-ARCore devices.
+
+## Current AR Host
+
+The first AR host uses SceneView `ARSceneView` with `Session.Feature.FRONT_CAMERA` and ARCore Augmented Faces set to `MESH3D`. Plane finding and light estimation are disabled for this first selfie flow. The host reports session lifecycle and tracking status to Compose, but it does not yet attach a character model or solve final shoulder placement in the render tree.
