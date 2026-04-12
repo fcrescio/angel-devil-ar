@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.angelmirror.character.CharacterModelNodeFactory
 import io.github.sceneview.ar.ARSceneView
 
 @Composable
@@ -15,6 +16,9 @@ fun ArHostView(
 ) {
     val context = LocalContext.current
     val sceneView = remember {
+        var characterPreviewAttached = false
+        var characterPreviewFailure: String? = null
+
         ARSceneView(
             context = context,
             sessionFeatures = AugmentedFaceSessionConfig.FrontCameraFeatures,
@@ -23,7 +27,12 @@ fun ArHostView(
                 onStatusChanged(ArSessionStatus.Creating)
             },
             onSessionResumed = {
-                onStatusChanged(ArSessionStatus.Running)
+                val failure = characterPreviewFailure
+                when {
+                    failure != null -> onStatusChanged(ArSessionStatus.Failed(failure))
+                    characterPreviewAttached -> onStatusChanged(ArSessionStatus.CharacterPreviewReady)
+                    else -> onStatusChanged(ArSessionStatus.Running)
+                }
             },
             onSessionPaused = {
                 onStatusChanged(ArSessionStatus.Paused)
@@ -42,7 +51,16 @@ fun ArHostView(
                     onStatusChanged(ArSessionStatus.TrackingIssue(reason.name))
                 }
             },
-        )
+        ).apply {
+            runCatching {
+                addChildNode(CharacterModelNodeFactory.createPlaceholder(this))
+                characterPreviewAttached = true
+            }.onSuccess {
+                characterPreviewFailure = null
+            }.onFailure { exception ->
+                characterPreviewFailure = exception.message ?: exception::class.java.simpleName
+            }
+        }
     }
 
     DisposableEffect(Unit) {

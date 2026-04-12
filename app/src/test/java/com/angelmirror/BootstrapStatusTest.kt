@@ -1,6 +1,7 @@
 package com.angelmirror
 
 import com.angelmirror.app.BootstrapStatus
+import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.ShoulderPlacementSolver
 import com.angelmirror.character.ShoulderPlacementOffset
 import com.angelmirror.ar.ArAvailabilityState
@@ -20,6 +21,11 @@ class BootstrapStatusTest {
         ArAvailabilityState.entries.forEach { state ->
             assertTrue(state.message.isNotBlank())
         }
+    }
+
+    @Test
+    fun placeholderCharacterAssetIsGlb() {
+        assertTrue(CharacterModelNodeFactory.PlaceholderAsset.assetPath.endsWith(".glb"))
     }
 
     @Test

@@ -3,8 +3,6 @@
 ## Ready
 
 - [ ] B010 Add dependency validation for ARCore and SceneView versions.
-- [ ] B015 Add placeholder GLB asset task and asset policy.
-
 ## In Progress
 
 - [ ]
@@ -28,4 +26,5 @@
 - [x] B012 Add ARCore availability checks.
 - [x] B013 Create first AR host screen placeholder.
 - [x] B014 Define face pose adapter contract for Augmented Faces.
+- [x] B015 Add placeholder GLB asset task and asset policy.
 - [x] B016 Define shoulder-relative placement inputs and default offsets.

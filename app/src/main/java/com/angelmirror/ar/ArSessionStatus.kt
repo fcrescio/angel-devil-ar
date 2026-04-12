@@ -15,6 +15,10 @@ sealed interface ArSessionStatus {
         override val message: String = "Front camera AR session is running."
     }
 
+    data object CharacterPreviewReady : ArSessionStatus {
+        override val message: String = "AR session is running with the placeholder character."
+    }
+
     data object Paused : ArSessionStatus {
         override val message: String = "AR session is paused."
     }
