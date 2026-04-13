@@ -1,6 +1,8 @@
 package com.angelmirror
 
 import com.angelmirror.app.BootstrapStatus
+import com.angelmirror.character.CharacterAnimationIntent
+import com.angelmirror.character.CharacterAnimationIntentMapper
 import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.CharacterPlacementProfiles
 import com.angelmirror.character.ShoulderPlacementSolver
@@ -107,5 +109,29 @@ class BootstrapStatusTest {
         assertEquals("AR is paused.", state.cue.text)
         assertEquals(false, state.voiceInputEnabled)
         assertEquals(false, state.llmResponseEnabled)
+    }
+
+    @Test
+    fun characterAnimationIntentMapperMapsAllMoods() {
+        assertEquals(
+            CharacterAnimationIntent.Appearing,
+            CharacterAnimationIntentMapper.fromMood(CompanionMood.WarmingUp),
+        )
+        assertEquals(
+            CharacterAnimationIntent.Idle,
+            CharacterAnimationIntentMapper.fromMood(CompanionMood.Present),
+        )
+        assertEquals(
+            CharacterAnimationIntent.Searching,
+            CharacterAnimationIntentMapper.fromMood(CompanionMood.Searching),
+        )
+        assertEquals(
+            CharacterAnimationIntent.Blocked,
+            CharacterAnimationIntentMapper.fromMood(CompanionMood.Blocked),
+        )
+        assertEquals(
+            CharacterAnimationIntent.Paused,
+            CharacterAnimationIntentMapper.fromMood(CompanionMood.Paused),
+        )
     }
 }
