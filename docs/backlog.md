@@ -2,8 +2,6 @@
 
 ## Ready
 
-- [ ] B022 Add pure Kotlin placement smoothing/math tests.
-
 ## In Progress
 
 - [ ]
@@ -18,6 +16,7 @@
 - [x] B019 Define first interaction cue surface for character behavior.
 - [x] B020 Add script to install latest successful CI debug APK.
 - [x] B021 Add character animation intent boundary.
+- [x] B022 Add pure Kotlin placement smoothing/math tests.
 - [x] B002 Add package skeleton for app/ui/ar/tracking/character/permissions/util.
 - [x] B003 Add README and project brief.
 - [x] B004 Add AGENTS.md and agentic docs.

@@ -134,4 +134,47 @@ class BootstrapStatusTest {
             CharacterAnimationIntentMapper.fromMood(CompanionMood.Paused),
         )
     }
+
+    @Test
+    fun defaultPlacementProfileKeepsValidatedPixel7Offsets() {
+        val profile = CharacterPlacementProfiles.Default
+
+        assertEquals("pixel7-ear-shoulder", profile.name)
+        assertEquals(0.15f, profile.offset.horizontalMeters, 0.001f)
+        assertEquals(-0.01f, profile.offset.verticalMeters, 0.001f)
+        assertEquals(-0.08f, profile.offset.depthMeters, 0.001f)
+        assertEquals(0.18f, profile.scaleToUnits, 0.001f)
+    }
+
+    @Test
+    fun shoulderPlacementHandlesZeroOffset() {
+        val placement = ShoulderPlacementSolver.solve(
+            facePose = FacePose(centerX = 1f, centerY = 2f, centerZ = 3f),
+            offset = ShoulderPlacementOffset(
+                horizontalMeters = 0f,
+                verticalMeters = 0f,
+                depthMeters = 0f,
+            ),
+        )
+
+        assertEquals(1f, placement.x, 0.001f)
+        assertEquals(2f, placement.y, 0.001f)
+        assertEquals(3f, placement.z, 0.001f)
+    }
+
+    @Test
+    fun shoulderPlacementHandlesNegativeHorizontalOffset() {
+        val placement = ShoulderPlacementSolver.solve(
+            facePose = FacePose(centerX = 0f, centerY = 0f, centerZ = 0f),
+            offset = ShoulderPlacementOffset(
+                horizontalMeters = -0.15f,
+                verticalMeters = 0f,
+                depthMeters = 0f,
+            ),
+        )
+
+        assertEquals(-0.15f, placement.x, 0.001f)
+        assertEquals(0f, placement.y, 0.001f)
+        assertEquals(0f, placement.z, 0.001f)
+    }
 }
