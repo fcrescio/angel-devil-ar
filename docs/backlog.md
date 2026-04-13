@@ -2,6 +2,10 @@
 
 ## Ready
 
+- [ ] B025 Add lightweight AR diagnostic log model (debug-only, pure Kotlin).
+- [ ] B026 Polish debug overlay UI without changing placement or AR lifecycle.
+- [ ] B027 Add asset validation script and documentation check for app-owned GLB assets.
+
 ## In Progress
 
 - [ ]
@@ -17,6 +21,8 @@
 - [x] B020 Add script to install latest successful CI debug APK.
 - [x] B021 Add character animation intent boundary.
 - [x] B022 Add pure Kotlin placement smoothing/math tests.
+- [x] B023 Surface character animation intent in debug state.
+- [x] B024 Add app-owned grotesque imp placeholder asset.
 - [x] B002 Add package skeleton for app/ui/ar/tracking/character/permissions/util.
 - [x] B003 Add README and project brief.
 - [x] B004 Add AGENTS.md and agentic docs.

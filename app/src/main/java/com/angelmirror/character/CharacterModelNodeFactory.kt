@@ -6,8 +6,8 @@ import io.github.sceneview.node.ModelNode
 
 object CharacterModelNodeFactory {
     val PlaceholderAsset = CharacterAsset(
-        assetPath = "models/fox.glb",
-        displayName = "Khronos Fox Placeholder",
+        assetPath = "models/grotesque_imp.glb",
+        displayName = "Grotesque Shoulder Imp",
     )
 
     fun createPlaceholder(

@@ -37,6 +37,12 @@ class BootstrapStatusTest {
     }
 
     @Test
+    fun placeholderCharacterUsesAppOwnedGrotesqueImp() {
+        assertEquals("models/grotesque_imp.glb", CharacterModelNodeFactory.PlaceholderAsset.assetPath)
+        assertEquals("Grotesque Shoulder Imp", CharacterModelNodeFactory.PlaceholderAsset.displayName)
+    }
+
+    @Test
     fun shoulderPreviewOffsetPlacesCharacterLowAndToTheSide() {
         val offset = CharacterPlacementProfiles.Default.offset
 

@@ -2,7 +2,15 @@
 
 ## Current Asset
 
-`app/src/main/assets/models/fox.glb` is the first placeholder character asset.
+`app/src/main/assets/models/grotesque_imp.glb` is the current placeholder character asset.
+
+It is a small procedural low-poly grotesque imp/devil with uneven horns, ragged wings, broken teeth, a kinked tail, and a cracked halo fragment. The asset was generated specifically for this repository from simple mesh primitives, so it is app-owned project art and has no external model license dependency.
+
+The previous technical placeholder remains in the repository for fallback/reference:
+
+`app/src/main/assets/models/fox.glb`
+
+## Previous Fox Placeholder
 
 Source: Khronos glTF Sample Models, `2.0/Fox/glTF-Binary/Fox.glb`.
 
@@ -12,7 +20,7 @@ License notes from the upstream model README:
 - Rigging and animation by @tomkranis on Sketchfab: CC-BY 4.0.
 - glTF conversion by @AsoboStudio and @scurest.
 
-This is a technical placeholder only. It is not final art direction for Angel Mirror AR.
+The fox is a technical placeholder only. It is not final art direction for Angel Mirror AR.
 
 ## Policy
 

@@ -38,6 +38,7 @@ import com.angelmirror.ar.AndroidArAvailabilityChecker
 import com.angelmirror.ar.ArAvailabilityState
 import com.angelmirror.ar.ArHostView
 import com.angelmirror.ar.ArSessionStatus
+import com.angelmirror.character.CharacterAnimationIntentMapper
 import com.angelmirror.character.CharacterPlacementDebugState
 import com.angelmirror.interaction.CompanionCue
 import com.angelmirror.interaction.CompanionInteractionReducer
@@ -152,6 +153,10 @@ private fun ArExperienceScreen(
         mutableStateOf(false)
     }
 
+    val animationIntent = remember(companionCue.mood) {
+        CharacterAnimationIntentMapper.fromMood(companionCue.mood)
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         ArHostView(
             modifier = Modifier.fillMaxSize(),
@@ -193,13 +198,16 @@ private fun ArExperienceScreen(
             }
         }
         if (showDebug && placementDebug != null) {
+            val debugStateWithAnimation = placementDebug.copy(
+                animationIntent = animationIntent,
+            )
             Text(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .windowInsetsPadding(WindowInsets.navigationBars)
                     .background(Color.Black.copy(alpha = 0.62f))
                     .padding(16.dp),
-                text = placementDebug.summary,
+                text = debugStateWithAnimation.summary,
                 color = Color.White,
                 style = MaterialTheme.typography.bodySmall,
             )
