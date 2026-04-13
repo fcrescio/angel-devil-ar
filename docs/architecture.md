@@ -39,4 +39,4 @@ New runtime dependencies require a backlog task and, when they affect architectu
 
 ## Current AR Host
 
-The first AR host uses SceneView `ARSceneView` with `Session.Feature.FRONT_CAMERA` and ARCore Augmented Faces set to `MESH3D`. Plane finding and light estimation are disabled for this first selfie flow. The host reports session lifecycle and tracking status to Compose and attaches a small GLB placeholder model at a fixed preview offset. Final face-driven shoulder placement is still a later render-tree integration step.
+The first AR host uses SceneView `ARSceneView` with `Session.Feature.FRONT_CAMERA` and ARCore Augmented Faces set to `MESH3D`. Plane finding and light estimation are disabled for this first selfie flow. The host reports session lifecycle and tracking status to Compose and attaches a small GLB placeholder model. On each AR frame, the character controller reads the tracked `AugmentedFace.centerPose`, applies a low side offset intended to sit near the shoulder, smooths movement, and updates the model node position.

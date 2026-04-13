@@ -19,6 +19,14 @@ sealed interface ArSessionStatus {
         override val message: String = "AR session is running with the placeholder character."
     }
 
+    data object FaceAnchoredCharacter : ArSessionStatus {
+        override val message: String = "Character is tracking the shoulder from the face pose."
+    }
+
+    data object SearchingForFace : ArSessionStatus {
+        override val message: String = "Look at the camera to place the character on your shoulder."
+    }
+
     data object Paused : ArSessionStatus {
         override val message: String = "AR session is paused."
     }

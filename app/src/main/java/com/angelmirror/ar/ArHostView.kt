@@ -7,6 +7,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.angelmirror.character.CharacterModelNodeFactory
+import com.angelmirror.character.FaceRelativeCharacterController
 import io.github.sceneview.ar.ARSceneView
 
 @Composable
@@ -18,6 +19,9 @@ fun ArHostView(
     val sceneView = remember {
         var characterPreviewAttached = false
         var characterPreviewFailure: String? = null
+        var faceAnchored = false
+        var faceMissingFrameCount = 0
+        var characterController: FaceRelativeCharacterController? = null
 
         ARSceneView(
             context = context,
@@ -51,9 +55,30 @@ fun ArHostView(
                     onStatusChanged(ArSessionStatus.TrackingIssue(reason.name))
                 }
             },
+            onSessionUpdated = { _, frame ->
+                val didUpdate = characterController?.update(frame) == true
+                if (didUpdate) {
+                    faceMissingFrameCount = 0
+                    if (!faceAnchored) {
+                        faceAnchored = true
+                        onStatusChanged(ArSessionStatus.FaceAnchoredCharacter)
+                    }
+                } else if (characterPreviewAttached) {
+                    faceMissingFrameCount += 1
+                    if (faceMissingFrameCount == MissingFaceStatusFrameThreshold) {
+                        faceAnchored = false
+                        onStatusChanged(ArSessionStatus.SearchingForFace)
+                    }
+                }
+            },
         ).apply {
             runCatching {
-                addChildNode(CharacterModelNodeFactory.createPlaceholder(this))
+                val characterNode = CharacterModelNodeFactory.createPlaceholder(this)
+                characterController = FaceRelativeCharacterController(
+                    modelNode = characterNode,
+                    offset = CharacterModelNodeFactory.ShoulderPreviewOffset,
+                )
+                addChildNode(characterNode)
                 characterPreviewAttached = true
             }.onSuccess {
                 characterPreviewFailure = null
@@ -79,3 +104,5 @@ fun ArHostView(
         factory = { sceneView },
     )
 }
+
+private const val MissingFaceStatusFrameThreshold = 20

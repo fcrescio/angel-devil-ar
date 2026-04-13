@@ -29,6 +29,15 @@ class BootstrapStatusTest {
     }
 
     @Test
+    fun shoulderPreviewOffsetPlacesCharacterLowAndToTheSide() {
+        val offset = CharacterModelNodeFactory.ShoulderPreviewOffset
+
+        assertTrue(offset.horizontalMeters > 0f)
+        assertTrue(offset.verticalMeters < -0.25f)
+        assertTrue(offset.depthMeters < 0f)
+    }
+
+    @Test
     fun shoulderPlacementAppliesOffsetToFacePose() {
         val placement = ShoulderPlacementSolver.solve(
             facePose = FacePose(centerX = 1f, centerY = 2f, centerZ = 3f),

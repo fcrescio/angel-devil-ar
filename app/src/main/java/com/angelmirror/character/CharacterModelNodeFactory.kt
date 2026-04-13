@@ -16,16 +16,22 @@ object CharacterModelNodeFactory {
                 assetFileLocation = PlaceholderAsset.assetPath,
             ),
             autoAnimate = true,
-            scaleToUnits = 0.32f,
+            scaleToUnits = 0.18f,
         ).apply {
             name = PlaceholderAsset.displayName
             position = Position(
-                x = 0.28f,
-                y = -0.18f,
-                z = -0.72f,
+                x = ShoulderPreviewOffset.horizontalMeters,
+                y = ShoulderPreviewOffset.verticalMeters,
+                z = -0.7f,
             )
             isShadowCaster = false
             isShadowReceiver = false
         }
     }
+
+    val ShoulderPreviewOffset = ShoulderPlacementOffset(
+        horizontalMeters = 0.22f,
+        verticalMeters = -0.34f,
+        depthMeters = -0.08f,
+    )
 }
