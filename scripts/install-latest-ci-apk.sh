@@ -30,7 +30,7 @@ RUN_ID=$("$GH_BIN" run list \
     --status success \
     --limit 1 \
     --json databaseId \
-    | jq -r '.[0].databaseId')
+    --jq '.[0].databaseId')
 
 if [[ -z "$RUN_ID" || "$RUN_ID" == "null" ]]; then
     echo "ERROR: No successful '${WORKFLOW_NAME}' run found on '${BRANCH}'."
