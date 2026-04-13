@@ -8,8 +8,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.union
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -135,32 +142,36 @@ private fun ArExperienceScreen(
             onStatusChanged = onStatusChanged,
             onPlacementDebugChanged = onPlacementDebugChanged,
         )
-        Text(
+        Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
+                .windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.displayCutout))
                 .background(Color.Black.copy(alpha = 0.56f))
                 .padding(16.dp),
-            text = status.message,
-            color = Color.White,
-            style = MaterialTheme.typography.bodyMedium,
-        )
-        TextButton(
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .background(Color.Black.copy(alpha = 0.42f)),
-            onClick = {
-                showDebug = !showDebug
-            },
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = if (showDebug) "Hide debug" else "Debug",
+                modifier = Modifier.weight(1f),
+                text = status.message,
                 color = Color.White,
+                style = MaterialTheme.typography.bodyMedium,
             )
+            TextButton(
+                onClick = {
+                    showDebug = !showDebug
+                },
+            ) {
+                Text(
+                    text = if (showDebug) "Hide debug" else "Debug",
+                    color = Color.White,
+                )
+            }
         }
         if (showDebug && placementDebug != null) {
             Text(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
+                    .windowInsetsPadding(WindowInsets.navigationBars)
                     .background(Color.Black.copy(alpha = 0.62f))
                     .padding(16.dp),
                 text = placementDebug.summary,
