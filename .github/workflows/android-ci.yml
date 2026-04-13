@@ -19,8 +19,17 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Restore debug keystore
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: android-debug-keystore-v1
+
       - name: Build debug
         run: ./gradlew assembleDebug
+
+      - name: Check APK 16 KB alignment
+        run: ./scripts/apk-alignment-check.sh app/build/outputs/apk/debug/app-debug.apk
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4

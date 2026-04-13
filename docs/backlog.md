@@ -3,6 +3,8 @@
 ## Ready
 
 - [ ] B010 Add dependency validation for ARCore and SceneView versions.
+- [ ] B017 Add signed debug install notes and 16 KB release-readiness policy.
+
 ## In Progress
 
 - [ ]

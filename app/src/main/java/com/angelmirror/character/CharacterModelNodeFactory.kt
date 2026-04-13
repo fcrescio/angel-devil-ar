@@ -30,8 +30,8 @@ object CharacterModelNodeFactory {
     }
 
     val ShoulderPreviewOffset = ShoulderPlacementOffset(
-        horizontalMeters = 0.22f,
-        verticalMeters = -0.34f,
+        horizontalMeters = 0.20f,
+        verticalMeters = 0.04f,
         depthMeters = -0.08f,
     )
 }
