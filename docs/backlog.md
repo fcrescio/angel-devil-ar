@@ -2,6 +2,10 @@
 
 ## Ready
 
+- [ ] B020 Add script to install latest successful CI debug APK.
+- [ ] B021 Add character animation intent boundary.
+- [ ] B022 Add pure Kotlin placement smoothing/math tests.
+
 ## In Progress
 
 - [ ]
