@@ -3,8 +3,6 @@
 ## Ready
 
 - [ ] B010 Add dependency validation for ARCore and SceneView versions.
-- [ ] B017 Add signed debug install notes and 16 KB release-readiness policy.
-
 ## In Progress
 
 - [ ]
@@ -30,3 +28,4 @@
 - [x] B014 Define face pose adapter contract for Augmented Faces.
 - [x] B015 Add placeholder GLB asset task and asset policy.
 - [x] B016 Define shoulder-relative placement inputs and default offsets.
+- [x] B017 Add signed debug install notes and 16 KB release-readiness policy.

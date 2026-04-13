@@ -8,6 +8,15 @@ android {
     namespace = "com.angelmirror"
     compileSdk = 35
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("keystores/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
+    }
+
     defaultConfig {
         applicationId = "com.angelmirror"
         minSdk = 24
