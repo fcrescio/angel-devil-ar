@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -38,6 +39,10 @@ import com.angelmirror.ar.ArAvailabilityState
 import com.angelmirror.ar.ArHostView
 import com.angelmirror.ar.ArSessionStatus
 import com.angelmirror.character.CharacterPlacementDebugState
+import com.angelmirror.interaction.CompanionCue
+import com.angelmirror.interaction.CompanionInteractionReducer
+import com.angelmirror.interaction.CompanionInteractionState
+import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.permissions.CameraPermissionChecker
 import com.angelmirror.permissions.CameraPermissionState
 
@@ -61,6 +66,9 @@ private fun ReadinessScreen() {
     }
     var arSessionStatus by remember {
         mutableStateOf<ArSessionStatus>(ArSessionStatus.NotStarted)
+    }
+    var companionInteraction by remember {
+        mutableStateOf(CompanionInteractionState())
     }
     var placementDebug by remember {
         mutableStateOf<CharacterPlacementDebugState?>(null)
@@ -87,9 +95,16 @@ private fun ReadinessScreen() {
     if (isReadyForAr) {
         ArExperienceScreen(
             status = arSessionStatus,
+            companionCue = companionInteraction.cue,
             placementDebug = placementDebug,
             onStatusChanged = {
                 arSessionStatus = it
+                it.toCompanionSignal()?.let { signal ->
+                    companionInteraction = CompanionInteractionReducer.reduce(
+                        current = companionInteraction,
+                        signal = signal,
+                    )
+                }
             },
             onPlacementDebugChanged = {
                 placementDebug = it
@@ -128,6 +143,7 @@ private fun ReadinessScreen() {
 @Composable
 private fun ArExperienceScreen(
     status: ArSessionStatus,
+    companionCue: CompanionCue,
     placementDebug: CharacterPlacementDebugState?,
     onStatusChanged: (ArSessionStatus) -> Unit,
     onPlacementDebugChanged: (CharacterPlacementDebugState) -> Unit,
@@ -145,17 +161,26 @@ private fun ArExperienceScreen(
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
+                .fillMaxWidth()
                 .windowInsetsPadding(WindowInsets.statusBars.union(WindowInsets.displayCutout))
                 .background(Color.Black.copy(alpha = 0.56f))
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
+            Column(
                 modifier = Modifier.weight(1f),
-                text = status.message,
-                color = Color.White,
-                style = MaterialTheme.typography.bodyMedium,
-            )
+            ) {
+                Text(
+                    text = companionCue.text,
+                    color = Color.White,
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+                Text(
+                    text = status.message,
+                    color = Color.White.copy(alpha = 0.78f),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
             TextButton(
                 onClick = {
                     showDebug = !showDebug
@@ -179,6 +204,21 @@ private fun ArExperienceScreen(
                 style = MaterialTheme.typography.bodySmall,
             )
         }
+    }
+}
+
+private fun ArSessionStatus.toCompanionSignal(): CompanionSignal? {
+    return when (this) {
+        ArSessionStatus.Creating -> CompanionSignal.ArSessionStarting
+        ArSessionStatus.FaceAnchoredCharacter -> CompanionSignal.CharacterPlaced
+        ArSessionStatus.SearchingForFace -> CompanionSignal.FaceLost
+        is ArSessionStatus.TrackingIssue -> CompanionSignal.FaceLost
+        is ArSessionStatus.Failed -> CompanionSignal.ArSessionFailed(reason)
+        ArSessionStatus.NotStarted,
+        ArSessionStatus.Running,
+        ArSessionStatus.CharacterPreviewReady,
+        ArSessionStatus.Paused,
+        -> null
     }
 }
 

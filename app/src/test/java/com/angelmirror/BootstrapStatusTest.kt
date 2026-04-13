@@ -6,6 +6,11 @@ import com.angelmirror.character.CharacterPlacementProfiles
 import com.angelmirror.character.ShoulderPlacementSolver
 import com.angelmirror.character.ShoulderPlacementOffset
 import com.angelmirror.ar.ArAvailabilityState
+import com.angelmirror.interaction.CompanionCues
+import com.angelmirror.interaction.CompanionInteractionReducer
+import com.angelmirror.interaction.CompanionInteractionState
+import com.angelmirror.interaction.CompanionMood
+import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.tracking.FacePose
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
@@ -53,5 +58,40 @@ class BootstrapStatusTest {
         assertEquals(1.25f, placement.x, 0.001f)
         assertEquals(1.9f, placement.y, 0.001f)
         assertEquals(2.8f, placement.z, 0.001f)
+    }
+
+    @Test
+    fun companionInteractionStartsWithoutVoiceOrLlmSideEffects() {
+        val state = CompanionInteractionState()
+
+        assertEquals(CompanionCues.WarmingUp, state.cue)
+        assertEquals(false, state.voiceInputEnabled)
+        assertEquals(false, state.llmResponseEnabled)
+    }
+
+    @Test
+    fun companionInteractionTracksCharacterPlacement() {
+        val state = CompanionInteractionReducer.reduce(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.CharacterPlaced,
+        )
+
+        assertEquals(CompanionMood.Present, state.cue.mood)
+        assertEquals("present", state.cue.id)
+        assertEquals(false, state.voiceInputEnabled)
+        assertEquals(false, state.llmResponseEnabled)
+    }
+
+    @Test
+    fun companionInteractionReportsBlockedArState() {
+        val state = CompanionInteractionReducer.reduce(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.ArSessionFailed("camera unavailable"),
+        )
+
+        assertEquals(CompanionMood.Blocked, state.cue.mood)
+        assertTrue(state.cue.text.contains("camera unavailable"))
+        assertEquals(false, state.voiceInputEnabled)
+        assertEquals(false, state.llmResponseEnabled)
     }
 }

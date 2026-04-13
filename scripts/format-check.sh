@@ -4,6 +4,8 @@ set -euo pipefail
 bad_files="$(find . \
   -path ./.git -prune -o \
   -path ./.gradle -prune -o \
+  -path ./app/build -prune -o \
+  -path ./build -prune -o \
   -type f \
   \( -name "*.kt" -o -name "*.kts" -o -name "*.md" -o -name "*.yml" -o -name "*.yaml" -o -name "*.xml" -o -name "*.sh" \) \
   -exec awk 'BEGIN { bad=0 } /[[:blank:]]$/ { print FILENAME ":" FNR ": trailing whitespace"; bad=1 } END { exit bad }' {} \; \

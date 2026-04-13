@@ -23,3 +23,5 @@ Use face/head pose, offset, and smoothing to place the character near the should
 ## M5 - Interaction Prep
 
 Add interfaces and state boundaries that can later support voice and LLM integration without adding those systems yet.
+
+Initial work is in place: the app now has a pure Kotlin companion interaction reducer and cue model, while voice input and LLM responses remain disabled by design.

@@ -19,6 +19,9 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Validate AR dependencies
+        run: ./scripts/dependency-validation-check.sh
+
       - name: Build debug
         run: ./gradlew assembleDebug
 

@@ -11,6 +11,7 @@ The bootstrap uses a single Android app module. Internal package boundaries are 
 - `ar`: ARCore session lifecycle, SceneView bridge, and renderer ownership.
 - `tracking`: face/head pose data, smoothing, and pose transforms.
 - `character`: GLB asset loading, character node ownership, animation hooks, and placement rules.
+- `interaction`: companion mood, cues, and reducer boundaries for future voice/LLM behavior.
 - `permissions`: camera permission and ARCore availability checks.
 - `util`: small shared helpers only.
 
@@ -21,7 +22,8 @@ The bootstrap uses a single Android app module. Internal package boundaries are 
 3. ARCore Augmented Faces produces face/head pose data.
 4. `tracking` converts raw pose data into stable app-level pose objects.
 5. `character` applies shoulder-relative placement and exposes renderable character state.
-6. `ui` displays state and hosts the AR surface.
+6. `interaction` maps AR/character signals into companion-facing cues without invoking voice or LLM systems.
+7. `ui` displays state and hosts the AR surface.
 
 ## Placement Constraint
 
@@ -51,3 +53,7 @@ The current validated placement profile is `pixel7-ear-shoulder`:
 - placeholder scale: `0.18`
 
 The AR screen includes a lightweight debug overlay toggle that reports the active profile, offset, and latest smoothed model placement.
+
+## Interaction Boundary
+
+The first interaction layer is intentionally local and deterministic. `CompanionInteractionReducer` accepts simple AR/character signals and returns a `CompanionInteractionState` containing the current cue, mood, and disabled voice/LLM flags. This gives future ASR/TTS/LLM work a stable app boundary without adding those systems to the AR rendering path.

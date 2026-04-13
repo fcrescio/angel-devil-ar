@@ -2,7 +2,7 @@
 
 ## Ready
 
-- [ ] B010 Add dependency validation for ARCore and SceneView versions.
+- [ ] B019 Define first interaction cue surface for character behavior.
 ## In Progress
 
 - [ ]
@@ -29,3 +29,5 @@
 - [x] B015 Add placeholder GLB asset task and asset policy.
 - [x] B016 Define shoulder-relative placement inputs and default offsets.
 - [x] B017 Add signed debug install notes and 16 KB release-readiness policy.
+- [x] B010 Add dependency validation for ARCore and SceneView versions.
+- [x] B018 Add interaction state boundary for future voice and LLM work.
