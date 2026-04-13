@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -34,6 +35,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.angelmirror.ar.AndroidArAvailabilityChecker
 import com.angelmirror.ar.ArAvailabilityState
 import com.angelmirror.ar.ArHostView
@@ -201,17 +203,37 @@ private fun ArExperienceScreen(
             val debugStateWithAnimation = placementDebug.copy(
                 animationIntent = animationIntent,
             )
-            Text(
+            PlacementDebugOverlay(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
+                    .fillMaxWidth()
                     .windowInsetsPadding(WindowInsets.navigationBars)
-                    .background(Color.Black.copy(alpha = 0.62f))
-                    .padding(16.dp),
-                text = debugStateWithAnimation.summary,
-                color = Color.White,
-                style = MaterialTheme.typography.bodySmall,
+                    .padding(12.dp),
+                summary = debugStateWithAnimation.summary,
             )
         }
+    }
+}
+
+@Composable
+private fun PlacementDebugOverlay(
+    summary: String,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .background(
+                color = Color.Black.copy(alpha = 0.72f),
+                shape = RoundedCornerShape(8.dp),
+            )
+            .padding(horizontal = 14.dp, vertical = 12.dp),
+    ) {
+        Text(
+            text = summary,
+            color = Color.White,
+            style = MaterialTheme.typography.bodySmall,
+            lineHeight = 16.sp,
+        )
     }
 }
 

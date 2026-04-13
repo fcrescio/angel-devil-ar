@@ -2,8 +2,6 @@
 
 ## Ready
 
-- [ ] B026 Polish debug overlay UI without changing placement or AR lifecycle.
-- [ ] B027 Add asset validation script and documentation check for app-owned GLB assets.
 
 ## In Progress
 
@@ -16,6 +14,8 @@
 ## Done
 
 - [x] B001 Initialize Android project with Kotlin and Compose.
+- [x] B027 Add asset validation script and documentation check for app-owned GLB assets.
+- [x] B026 Polish debug overlay UI without changing placement or AR lifecycle.
 - [x] B019 Define first interaction cue surface for character behavior.
 - [x] B020 Add script to install latest successful CI debug APK.
 - [x] B021 Add character animation intent boundary.

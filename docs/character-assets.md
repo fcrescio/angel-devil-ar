@@ -31,3 +31,21 @@ The fox is a technical placeholder only. It is not final art direction for Angel
 - Store app-owned runtime assets under `app/src/main/assets/`.
 - Record source, license, and any modifications here.
 - Do not add generated binary variants without a task.
+
+## Validation
+
+Assets are validated by `scripts/validate-assets.sh`:
+
+- File exists at expected path.
+- Size under 5MB.
+- Valid GLB header with magic `glTF`.
+- GLB version 2.
+- Declared length matches actual file size.
+- Contains JSON chunk (glTF data).
+- Contains BIN chunk (binary data).
+
+Run validation with:
+
+```sh
+./scripts/validate-assets.sh
+```
