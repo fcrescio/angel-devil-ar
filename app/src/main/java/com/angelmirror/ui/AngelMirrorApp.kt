@@ -14,6 +14,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -26,9 +27,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.angelmirror.ar.AndroidArAvailabilityChecker
+import com.angelmirror.ar.ArAvailabilityState
 import com.angelmirror.ar.ArHostView
 import com.angelmirror.ar.ArSessionStatus
-import com.angelmirror.ar.ArAvailabilityState
+import com.angelmirror.character.CharacterPlacementDebugState
 import com.angelmirror.permissions.CameraPermissionChecker
 import com.angelmirror.permissions.CameraPermissionState
 
@@ -53,6 +55,9 @@ private fun ReadinessScreen() {
     var arSessionStatus by remember {
         mutableStateOf<ArSessionStatus>(ArSessionStatus.NotStarted)
     }
+    var placementDebug by remember {
+        mutableStateOf<CharacterPlacementDebugState?>(null)
+    }
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { granted ->
@@ -75,8 +80,12 @@ private fun ReadinessScreen() {
     if (isReadyForAr) {
         ArExperienceScreen(
             status = arSessionStatus,
+            placementDebug = placementDebug,
             onStatusChanged = {
                 arSessionStatus = it
+            },
+            onPlacementDebugChanged = {
+                placementDebug = it
             },
         )
         return
@@ -112,12 +121,19 @@ private fun ReadinessScreen() {
 @Composable
 private fun ArExperienceScreen(
     status: ArSessionStatus,
+    placementDebug: CharacterPlacementDebugState?,
     onStatusChanged: (ArSessionStatus) -> Unit,
+    onPlacementDebugChanged: (CharacterPlacementDebugState) -> Unit,
 ) {
+    var showDebug by remember {
+        mutableStateOf(false)
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         ArHostView(
             modifier = Modifier.fillMaxSize(),
             onStatusChanged = onStatusChanged,
+            onPlacementDebugChanged = onPlacementDebugChanged,
         )
         Text(
             modifier = Modifier
@@ -128,6 +144,30 @@ private fun ArExperienceScreen(
             color = Color.White,
             style = MaterialTheme.typography.bodyMedium,
         )
+        TextButton(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .background(Color.Black.copy(alpha = 0.42f)),
+            onClick = {
+                showDebug = !showDebug
+            },
+        ) {
+            Text(
+                text = if (showDebug) "Hide debug" else "Debug",
+                color = Color.White,
+            )
+        }
+        if (showDebug && placementDebug != null) {
+            Text(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .background(Color.Black.copy(alpha = 0.62f))
+                    .padding(16.dp),
+                text = placementDebug.summary,
+                color = Color.White,
+                style = MaterialTheme.typography.bodySmall,
+            )
+        }
     }
 }
 

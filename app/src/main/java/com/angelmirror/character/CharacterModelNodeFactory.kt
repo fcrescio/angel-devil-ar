@@ -10,28 +10,25 @@ object CharacterModelNodeFactory {
         displayName = "Khronos Fox Placeholder",
     )
 
-    fun createPlaceholder(sceneView: ARSceneView): ModelNode {
+    fun createPlaceholder(
+        sceneView: ARSceneView,
+        profile: CharacterPlacementProfile = CharacterPlacementProfiles.Default,
+    ): ModelNode {
         return ModelNode(
             modelInstance = sceneView.modelLoader.createModelInstance(
                 assetFileLocation = PlaceholderAsset.assetPath,
             ),
             autoAnimate = true,
-            scaleToUnits = 0.18f,
+            scaleToUnits = profile.scaleToUnits,
         ).apply {
             name = PlaceholderAsset.displayName
             position = Position(
-                x = ShoulderPreviewOffset.horizontalMeters,
-                y = ShoulderPreviewOffset.verticalMeters,
+                x = profile.offset.horizontalMeters,
+                y = profile.offset.verticalMeters,
                 z = -0.7f,
             )
             isShadowCaster = false
             isShadowReceiver = false
         }
     }
-
-    val ShoulderPreviewOffset = ShoulderPlacementOffset(
-        horizontalMeters = 0.15f,
-        verticalMeters = -0.01f,
-        depthMeters = -0.08f,
-    )
 }

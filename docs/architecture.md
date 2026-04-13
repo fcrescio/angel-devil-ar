@@ -40,3 +40,14 @@ New runtime dependencies require a backlog task and, when they affect architectu
 ## Current AR Host
 
 The first AR host uses SceneView `ARSceneView` with `Session.Feature.FRONT_CAMERA` and ARCore Augmented Faces set to `MESH3D`. Plane finding and light estimation are disabled for this first selfie flow. The host reports session lifecycle and tracking status to Compose and attaches a small GLB placeholder model. On each AR frame, the character controller reads the tracked `AugmentedFace.centerPose`, applies a side-and-up offset intended to sit near shoulder/ear height, smooths movement, and updates the model node position.
+
+## Placement Baseline
+
+The current validated placement profile is `pixel7-ear-shoulder`:
+
+- horizontal offset: `0.15m`
+- vertical offset: `-0.01m`
+- depth offset: `-0.08m`
+- placeholder scale: `0.18`
+
+The AR screen includes a lightweight debug overlay toggle that reports the active profile, offset, and latest smoothed model placement.

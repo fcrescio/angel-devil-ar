@@ -2,6 +2,7 @@ package com.angelmirror
 
 import com.angelmirror.app.BootstrapStatus
 import com.angelmirror.character.CharacterModelNodeFactory
+import com.angelmirror.character.CharacterPlacementProfiles
 import com.angelmirror.character.ShoulderPlacementSolver
 import com.angelmirror.character.ShoulderPlacementOffset
 import com.angelmirror.ar.ArAvailabilityState
@@ -30,7 +31,7 @@ class BootstrapStatusTest {
 
     @Test
     fun shoulderPreviewOffsetPlacesCharacterLowAndToTheSide() {
-        val offset = CharacterModelNodeFactory.ShoulderPreviewOffset
+        val offset = CharacterPlacementProfiles.Default.offset
 
         assertTrue(offset.horizontalMeters > 0f)
         assertTrue(offset.verticalMeters > -0.1f)

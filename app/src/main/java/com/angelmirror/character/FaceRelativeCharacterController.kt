@@ -9,14 +9,19 @@ import io.github.sceneview.node.ModelNode
 
 class FaceRelativeCharacterController(
     private val modelNode: ModelNode,
-    private val offset: ShoulderPlacementOffset = ShoulderPlacementOffset(),
+    private val profile: CharacterPlacementProfile = CharacterPlacementProfiles.Default,
+    private val onDebugStateChanged: (CharacterPlacementDebugState) -> Unit = {},
 ) {
     private var lastPlacement: ShoulderPlacement? = null
+    private val offset = profile.offset
 
     fun update(frame: Frame): Boolean {
         val face = frame.getUpdatedTrackables(AugmentedFace::class.java)
             .firstOrNull { it.trackingState == TrackingState.TRACKING }
-            ?: return false
+            ?: run {
+                onDebugStateChanged(debugState(tracking = false))
+                return false
+            }
 
         val pose = face.centerPose.compose(
             Pose.makeTranslation(
@@ -37,8 +42,18 @@ class FaceRelativeCharacterController(
             y = smoothed.y,
             z = smoothed.z,
         )
+        onDebugStateChanged(debugState(tracking = true))
 
         return true
+    }
+
+    private fun debugState(tracking: Boolean): CharacterPlacementDebugState {
+        return CharacterPlacementDebugState(
+            profileName = profile.name,
+            offset = offset,
+            latestPlacement = lastPlacement,
+            tracking = tracking,
+        )
     }
 
     private fun smooth(target: ShoulderPlacement): ShoulderPlacement {

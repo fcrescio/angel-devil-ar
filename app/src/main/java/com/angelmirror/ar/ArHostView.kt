@@ -7,6 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.angelmirror.character.CharacterModelNodeFactory
+import com.angelmirror.character.CharacterPlacementDebugState
+import com.angelmirror.character.CharacterPlacementProfiles
 import com.angelmirror.character.FaceRelativeCharacterController
 import io.github.sceneview.ar.ARSceneView
 
@@ -14,6 +16,7 @@ import io.github.sceneview.ar.ARSceneView
 fun ArHostView(
     modifier: Modifier = Modifier,
     onStatusChanged: (ArSessionStatus) -> Unit,
+    onPlacementDebugChanged: (CharacterPlacementDebugState) -> Unit = {},
 ) {
     val context = LocalContext.current
     val sceneView = remember {
@@ -73,10 +76,15 @@ fun ArHostView(
             },
         ).apply {
             runCatching {
-                val characterNode = CharacterModelNodeFactory.createPlaceholder(this)
+                val profile = CharacterPlacementProfiles.Default
+                val characterNode = CharacterModelNodeFactory.createPlaceholder(
+                    sceneView = this,
+                    profile = profile,
+                )
                 characterController = FaceRelativeCharacterController(
                     modelNode = characterNode,
-                    offset = CharacterModelNodeFactory.ShoulderPreviewOffset,
+                    profile = profile,
+                    onDebugStateChanged = onPlacementDebugChanged,
                 )
                 addChildNode(characterNode)
                 characterPreviewAttached = true
