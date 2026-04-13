@@ -5,6 +5,7 @@ enum class CompanionMood {
     Present,
     Searching,
     Blocked,
+    Paused,
 }
 
 data class CompanionCue(
@@ -23,6 +24,7 @@ sealed interface CompanionSignal {
     data object ArSessionStarting : CompanionSignal
     data object CharacterPlaced : CompanionSignal
     data object FaceLost : CompanionSignal
+    data object ArSessionPaused : CompanionSignal
     data class ArSessionFailed(
         val reason: String,
     ) : CompanionSignal
@@ -45,6 +47,12 @@ object CompanionCues {
         id = "find-face",
         text = "Look at the camera.",
         mood = CompanionMood.Searching,
+    )
+
+    val Paused = CompanionCue(
+        id = "paused",
+        text = "AR is paused.",
+        mood = CompanionMood.Paused,
     )
 
     fun blocked(reason: String): CompanionCue {
@@ -76,6 +84,12 @@ object CompanionInteractionReducer {
 
             CompanionSignal.FaceLost -> current.copy(
                 cue = CompanionCues.FindFace,
+                voiceInputEnabled = false,
+                llmResponseEnabled = false,
+            )
+
+            CompanionSignal.ArSessionPaused -> current.copy(
+                cue = CompanionCues.Paused,
                 voiceInputEnabled = false,
                 llmResponseEnabled = false,
             )

@@ -214,10 +214,10 @@ private fun ArSessionStatus.toCompanionSignal(): CompanionSignal? {
         ArSessionStatus.SearchingForFace -> CompanionSignal.FaceLost
         is ArSessionStatus.TrackingIssue -> CompanionSignal.FaceLost
         is ArSessionStatus.Failed -> CompanionSignal.ArSessionFailed(reason)
+        ArSessionStatus.Paused -> CompanionSignal.ArSessionPaused
         ArSessionStatus.NotStarted,
         ArSessionStatus.Running,
         ArSessionStatus.CharacterPreviewReady,
-        ArSessionStatus.Paused,
         -> null
     }
 }

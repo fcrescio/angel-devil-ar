@@ -94,4 +94,18 @@ class BootstrapStatusTest {
         assertEquals(false, state.voiceInputEnabled)
         assertEquals(false, state.llmResponseEnabled)
     }
+
+    @Test
+    fun companionInteractionHandlesPausedState() {
+        val state = CompanionInteractionReducer.reduce(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.ArSessionPaused,
+        )
+
+        assertEquals(CompanionMood.Paused, state.cue.mood)
+        assertEquals("paused", state.cue.id)
+        assertEquals("AR is paused.", state.cue.text)
+        assertEquals(false, state.voiceInputEnabled)
+        assertEquals(false, state.llmResponseEnabled)
+    }
 }

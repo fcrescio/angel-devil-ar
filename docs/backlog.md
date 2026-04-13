@@ -2,7 +2,6 @@
 
 ## Ready
 
-- [ ] B019 Define first interaction cue surface for character behavior.
 ## In Progress
 
 - [ ]
@@ -14,6 +13,7 @@
 ## Done
 
 - [x] B001 Initialize Android project with Kotlin and Compose.
+- [x] B019 Define first interaction cue surface for character behavior.
 - [x] B002 Add package skeleton for app/ui/ar/tracking/character/permissions/util.
 - [x] B003 Add README and project brief.
 - [x] B004 Add AGENTS.md and agentic docs.
