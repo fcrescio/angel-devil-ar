@@ -33,7 +33,8 @@ class BootstrapStatusTest {
         val offset = CharacterModelNodeFactory.ShoulderPreviewOffset
 
         assertTrue(offset.horizontalMeters > 0f)
-        assertTrue(offset.verticalMeters > 0f)
+        assertTrue(offset.verticalMeters > -0.1f)
+        assertTrue(offset.verticalMeters < 0.1f)
         assertTrue(offset.depthMeters < 0f)
     }
 
