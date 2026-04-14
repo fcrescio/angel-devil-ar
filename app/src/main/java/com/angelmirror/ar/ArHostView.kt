@@ -6,6 +6,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.angelmirror.character.CharacterLighting
 import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.CharacterPlacementDebugState
 import com.angelmirror.character.CharacterPlacementProfiles
@@ -75,6 +76,7 @@ fun ArHostView(
                 }
             },
         ).apply {
+            CharacterLighting.applyDevilFrontLowKey(this)
             runCatching {
                 val profile = CharacterPlacementProfiles.Default
                 val characterNode = CharacterModelNodeFactory.createPlaceholder(

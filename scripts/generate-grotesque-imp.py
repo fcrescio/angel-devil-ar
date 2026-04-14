@@ -159,6 +159,70 @@ def tail_segment(start: tuple[float, float, float], end: tuple[float, float, flo
     return vertices, [0, 1, 2, 0, 2, 3, 2, 1, 0, 3, 2, 0]
 
 
+def cross(
+    a: tuple[float, float, float],
+    b: tuple[float, float, float],
+) -> tuple[float, float, float]:
+    return (
+        (a[1] * b[2]) - (a[2] * b[1]),
+        (a[2] * b[0]) - (a[0] * b[2]),
+        (a[0] * b[1]) - (a[1] * b[0]),
+    )
+
+
+def dot(
+    a: tuple[float, float, float],
+    b: tuple[float, float, float],
+) -> float:
+    return (a[0] * b[0]) + (a[1] * b[1]) + (a[2] * b[2])
+
+
+def subtract(
+    a: tuple[float, float, float],
+    b: tuple[float, float, float],
+) -> tuple[float, float, float]:
+    return (a[0] - b[0], a[1] - b[1], a[2] - b[2])
+
+
+def average(points: list[tuple[float, float, float]]) -> tuple[float, float, float]:
+    count = float(len(points))
+    return (
+        sum(point[0] for point in points) / count,
+        sum(point[1] for point in points) / count,
+        sum(point[2] for point in points) / count,
+    )
+
+
+def normalize(vector: tuple[float, float, float]) -> tuple[float, float, float]:
+    length = math.sqrt(sum(component * component for component in vector))
+    if length <= 0.000001:
+        return (0.0, 1.0, 0.0)
+    return tuple(component / length for component in vector)
+
+
+def compute_normals(
+    vertices: list[tuple[float, float, float]],
+    indices: list[int],
+) -> list[tuple[float, float, float]]:
+    primitive_center = average(vertices)
+    accumulators = [[0.0, 0.0, 0.0] for _ in vertices]
+    for i in range(0, len(indices), 3):
+        i0, i1, i2 = indices[i], indices[i + 1], indices[i + 2]
+        v0, v1, v2 = vertices[i0], vertices[i1], vertices[i2]
+        normal = cross(subtract(v1, v0), subtract(v2, v0))
+        triangle_center = average([v0, v1, v2])
+        outward = subtract(triangle_center, primitive_center)
+        if abs(dot(normal, outward)) <= 0.000001:
+            outward = triangle_center
+        if dot(normal, outward) < 0.0:
+            normal = (-normal[0], -normal[1], -normal[2])
+        for vertex_index in (i0, i1, i2):
+            accumulators[vertex_index][0] += normal[0]
+            accumulators[vertex_index][1] += normal[1]
+            accumulators[vertex_index][2] += normal[2]
+    return [normalize((normal[0], normal[1], normal[2])) for normal in accumulators]
+
+
 def build_imp() -> MeshBuilder:
     mesh = MeshBuilder()
 
@@ -240,6 +304,29 @@ def write_glb(path: Path, mesh: MeshBuilder) -> None:
             }
         )
 
+        normals = compute_normals(vertices, indices)
+        normal_blob = b"".join(struct.pack("<fff", *normal) for normal in normals)
+        normal_view = append_blob(normal_blob, 34962)
+        normal_accessor = len(accessors)
+        accessors.append(
+            {
+                "bufferView": normal_view,
+                "componentType": 5126,
+                "count": len(normals),
+                "type": "VEC3",
+                "min": [
+                    min(normal[0] for normal in normals),
+                    min(normal[1] for normal in normals),
+                    min(normal[2] for normal in normals),
+                ],
+                "max": [
+                    max(normal[0] for normal in normals),
+                    max(normal[1] for normal in normals),
+                    max(normal[2] for normal in normals),
+                ],
+            }
+        )
+
         index_blob = b"".join(struct.pack("<H", index) for index in indices)
         index_view = append_blob(index_blob, 34963)
         index_accessor = len(accessors)
@@ -260,7 +347,10 @@ def write_glb(path: Path, mesh: MeshBuilder) -> None:
                 "name": primitive["name"],
                 "primitives": [
                     {
-                        "attributes": {"POSITION": vertex_accessor},
+                        "attributes": {
+                            "POSITION": vertex_accessor,
+                            "NORMAL": normal_accessor,
+                        },
                         "indices": index_accessor,
                         "material": primitive["material"],
                         "mode": 4,
