@@ -162,6 +162,7 @@ private fun ArExperienceScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         ArHostView(
             modifier = Modifier.fillMaxSize(),
+            animationIntent = animationIntent,
             onStatusChanged = onStatusChanged,
             onPlacementDebugChanged = onPlacementDebugChanged,
         )

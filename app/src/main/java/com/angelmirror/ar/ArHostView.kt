@@ -3,9 +3,11 @@ package com.angelmirror.ar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import com.angelmirror.character.CharacterAnimationIntent
 import com.angelmirror.character.CharacterLighting
 import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.CharacterPlacementDebugState
@@ -17,16 +19,20 @@ import io.github.sceneview.ar.ARSceneView
 @Composable
 fun ArHostView(
     modifier: Modifier = Modifier,
+    animationIntent: CharacterAnimationIntent = CharacterPresentationProfiles.Default.initialAnimationIntent,
     onStatusChanged: (ArSessionStatus) -> Unit,
     onPlacementDebugChanged: (CharacterPlacementDebugState) -> Unit = {},
 ) {
     val context = LocalContext.current
+    val latestAnimationIntent = rememberUpdatedState(animationIntent)
+    val characterControllerRef = remember {
+        arrayOfNulls<FaceRelativeCharacterController>(1)
+    }
     val sceneView = remember {
         var characterPreviewAttached = false
         var characterPreviewFailure: String? = null
         var faceAnchored = false
         var faceMissingFrameCount = 0
-        var characterController: FaceRelativeCharacterController? = null
 
         ARSceneView(
             context = context,
@@ -61,7 +67,8 @@ fun ArHostView(
                 }
             },
             onSessionUpdated = { _, frame ->
-                val didUpdate = characterController?.update(frame) == true
+                characterControllerRef[0]?.animationIntent = latestAnimationIntent.value
+                val didUpdate = characterControllerRef[0]?.update(frame) == true
                 if (didUpdate) {
                     faceMissingFrameCount = 0
                     if (!faceAnchored) {
@@ -86,9 +93,10 @@ fun ArHostView(
                     profile = profile,
                     presentationProfile = presentationProfile,
                 )
-                characterController = FaceRelativeCharacterController(
+                characterControllerRef[0] = FaceRelativeCharacterController(
                     modelNode = characterNode,
                     profile = profile,
+                    initialAnimationIntent = presentationProfile.initialAnimationIntent,
                     onDebugStateChanged = onPlacementDebugChanged,
                 )
                 addChildNode(characterNode)
@@ -115,6 +123,9 @@ fun ArHostView(
     AndroidView(
         modifier = modifier,
         factory = { sceneView },
+        update = {
+            characterControllerRef[0]?.animationIntent = latestAnimationIntent.value
+        },
     )
 }
 
