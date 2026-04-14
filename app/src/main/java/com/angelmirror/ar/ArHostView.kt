@@ -10,6 +10,7 @@ import com.angelmirror.character.CharacterLighting
 import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.CharacterPlacementDebugState
 import com.angelmirror.character.CharacterPlacementProfiles
+import com.angelmirror.character.CharacterPresentationProfiles
 import com.angelmirror.character.FaceRelativeCharacterController
 import io.github.sceneview.ar.ARSceneView
 
@@ -76,12 +77,14 @@ fun ArHostView(
                 }
             },
         ).apply {
-            CharacterLighting.applyDevilFrontLowKey(this)
+            val presentationProfile = CharacterPresentationProfiles.Default
+            CharacterLighting.apply(this, presentationProfile.lighting)
             runCatching {
                 val profile = CharacterPlacementProfiles.Default
                 val characterNode = CharacterModelNodeFactory.createPlaceholder(
                     sceneView = this,
                     profile = profile,
+                    presentationProfile = presentationProfile,
                 )
                 characterController = FaceRelativeCharacterController(
                     modelNode = characterNode,

@@ -11,13 +11,17 @@ object CharacterLighting {
     const val DevilFrontLowKeyIntensity = 180_000.0f
     const val DevilIndirectLightIntensity = 18_000.0f
 
-    fun applyDevilFrontLowKey(sceneView: ARSceneView) {
+    fun apply(sceneView: ARSceneView, profile: CharacterLightingProfile) {
         sceneView.mainLightNode?.apply {
-            lightDirection = DevilFrontLowKeyDirection
-            color = DevilFrontLowKeyColor
-            intensity = DevilFrontLowKeyIntensity
-            isShadowCaster = false
+            lightDirection = profile.keyLightDirection
+            color = profile.keyLightColor
+            intensity = profile.keyLightIntensity
+            isShadowCaster = profile.castsShadows
         }
-        sceneView.indirectLight?.intensity = DevilIndirectLightIntensity
+        sceneView.indirectLight?.intensity = profile.indirectLightIntensity
+    }
+
+    fun applyDevilFrontLowKey(sceneView: ARSceneView) {
+        apply(sceneView, CharacterPresentationProfiles.Devil.lighting)
     }
 }

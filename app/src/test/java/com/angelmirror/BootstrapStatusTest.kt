@@ -5,6 +5,7 @@ import com.angelmirror.character.CharacterAnimationIntent
 import com.angelmirror.character.CharacterAnimationIntentMapper
 import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.CharacterPlacementProfiles
+import com.angelmirror.character.CharacterPresentationProfiles
 import com.angelmirror.character.ShoulderPlacementSolver
 import com.angelmirror.character.ShoulderPlacementOffset
 import com.angelmirror.ar.ArAvailabilityState
@@ -33,13 +34,18 @@ class BootstrapStatusTest {
 
     @Test
     fun placeholderCharacterAssetIsGlb() {
-        assertTrue(CharacterModelNodeFactory.PlaceholderAsset.assetPath.endsWith(".glb"))
+        assertTrue(CharacterPresentationProfiles.Default.asset.assetPath.endsWith(".glb"))
     }
 
     @Test
     fun placeholderCharacterUsesAppOwnedGrotesqueImp() {
-        assertEquals("models/grotesque_imp.glb", CharacterModelNodeFactory.PlaceholderAsset.assetPath)
-        assertEquals("Grotesque Shoulder Imp", CharacterModelNodeFactory.PlaceholderAsset.displayName)
+        val profile = CharacterPresentationProfiles.Default
+
+        assertEquals("grotesque-shoulder-imp", profile.id)
+        assertEquals("models/grotesque_imp.glb", profile.asset.assetPath)
+        assertEquals("Grotesque Shoulder Imp", profile.asset.displayName)
+        assertEquals(CharacterAnimationIntent.Appearing, profile.initialAnimationIntent)
+        assertEquals(profile.asset, CharacterModelNodeFactory.PlaceholderAsset)
     }
 
     @Test

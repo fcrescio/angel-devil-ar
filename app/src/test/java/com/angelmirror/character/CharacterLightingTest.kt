@@ -8,7 +8,8 @@ import org.junit.Test
 class CharacterLightingTest {
     @Test
     fun devilKeyLightTravelsFromFrontAndBelow() {
-        val direction = CharacterLighting.DevilFrontLowKeyDirection
+        val lighting = CharacterPresentationProfiles.Devil.lighting
+        val direction = lighting.keyLightDirection
         val length = sqrt(
             (direction.x * direction.x) +
                 (direction.y * direction.y) +
@@ -19,5 +20,7 @@ class CharacterLightingTest {
         assertEquals(0.0f, direction.x, 0.001f)
         assertTrue("light should travel upward from a low source", direction.y > 0.0f)
         assertTrue("light should travel from model-front +Z toward the face", direction.z < 0.0f)
+        assertEquals(CharacterLighting.DevilFrontLowKeyIntensity, lighting.keyLightIntensity, 0.001f)
+        assertEquals(CharacterLighting.DevilIndirectLightIntensity, lighting.indirectLightIntensity, 0.001f)
     }
 }
