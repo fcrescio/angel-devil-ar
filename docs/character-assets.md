@@ -4,7 +4,7 @@
 
 `app/src/main/assets/models/grotesque_imp.glb` is the current placeholder character asset.
 
-It is a small procedural low-poly grotesque imp/devil with uneven horns, ragged wings, broken teeth, a kinked tail, and a cracked halo fragment. The asset was generated specifically for this repository from simple mesh primitives, so it is app-owned project art and has no external model license dependency.
+It is a small procedural low-poly grotesque imp/devil with uneven horns, ragged wings, broken teeth, a kinked tail, and a cracked halo fragment. The asset was generated specifically for this repository from simple mesh primitives, so it is app-owned project art and has no external model license dependency. The front of the model faces positive Z; wings and tail sit on negative Z so the shoulder character reads face-first in AR.
 
 The previous technical placeholder remains in the repository for fallback/reference:
 
@@ -48,4 +48,18 @@ Run validation with:
 
 ```sh
 ./scripts/validate-assets.sh
+```
+
+## Generation And Review
+
+Regenerate the app-owned placeholder with:
+
+```sh
+./scripts/generate-grotesque-imp.py
+```
+
+Render a quick multi-angle contact sheet with:
+
+```sh
+./scripts/render-character-asset.py app/src/main/assets/models/grotesque_imp.glb --output /tmp/angel-asset-renders/contact.png
 ```
