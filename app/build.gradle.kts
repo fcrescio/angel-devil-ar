@@ -25,6 +25,10 @@ android {
         versionName = "0.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        ndk {
+            abiFilters += listOf("arm64-v8a", "x86_64")
+        }
     }
 
     buildTypes {
@@ -60,6 +64,9 @@ dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("com.google.ar:core:1.49.0")
     implementation("io.github.sceneview:arsceneview:2.2.1")
+    implementation("com.google.android.filament:filament-android:1.68.2")
+    implementation("com.google.android.filament:filament-utils-android:1.68.2")
+    implementation("com.google.android.filament:gltfio-android:1.68.2")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
 
