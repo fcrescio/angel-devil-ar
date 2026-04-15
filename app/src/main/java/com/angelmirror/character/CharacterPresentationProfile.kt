@@ -9,10 +9,10 @@ data class CharacterPresentationProfile(
 
 object CharacterPresentationProfiles {
     val Devil = CharacterPresentationProfile(
-        id = "grotesque-shoulder-imp",
+        id = "trellis-winged-devil",
         asset = CharacterAsset(
-            assetPath = "models/grotesque_imp.glb",
-            displayName = "Grotesque Shoulder Imp",
+            assetPath = "models/trellis_winged_devil.glb",
+            displayName = "Trellis Winged Devil",
         ),
         lighting = CharacterLightingProfile(
             keyLightDirection = CharacterLighting.DevilFrontLowKeyDirection,

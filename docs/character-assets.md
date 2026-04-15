@@ -2,7 +2,13 @@
 
 ## Current Asset
 
-`app/src/main/assets/models/grotesque_imp.glb` is the current placeholder character asset.
+`app/src/main/assets/models/trellis_winged_devil.glb` is the current runtime character asset for the devil profile.
+
+It is a Trellis-generated winged devil model provided as `mesh.glb` and imported into the app as `trellis_winged_devil.glb`. It contains a textured skinned mesh with joints and weights, but no authored animation clips yet. The joint names are still generic (`joint_0`, `joint_1`, ...), so runtime bone animation needs a later mapping pass before it can target head, wings, or tail reliably.
+
+The previous app-owned procedural placeholder remains in the repository for fallback/reference:
+
+`app/src/main/assets/models/grotesque_imp.glb`
 
 It is a small procedural low-poly grotesque imp/devil with uneven horns, ragged wings, broken teeth, a kinked tail, and a cracked halo fragment. The asset was generated specifically for this repository from simple mesh primitives, so it is app-owned project art and has no external model license dependency. The front of the model faces positive Z; wings and tail sit on negative Z so the shoulder character reads face-first in AR.
 
@@ -36,7 +42,7 @@ The fox is a technical placeholder only. It is not final art direction for Angel
 
 Assets are validated by `scripts/validate-assets.sh`:
 
-- File exists at expected path.
+- Files exist at expected runtime/fallback paths.
 - Size under 5MB.
 - Valid GLB header with magic `glTF`.
 - GLB version 2.

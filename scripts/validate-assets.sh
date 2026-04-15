@@ -2,24 +2,28 @@
 set -euo pipefail
 
 asset_dir="app/src/main/assets/models"
-glb_file="$asset_dir/grotesque_imp.glb"
 max_size=5242880  # 5MB
+glb_files=(
+    "$asset_dir/grotesque_imp.glb"
+    "$asset_dir/trellis_winged_devil.glb"
+)
 
-# Check file exists
-if [[ ! -f "$glb_file" ]]; then
-    echo "Missing: $glb_file" >&2
-    exit 1
-fi
+for glb_file in "${glb_files[@]}"; do
+    # Check file exists
+    if [[ ! -f "$glb_file" ]]; then
+        echo "Missing: $glb_file" >&2
+        exit 1
+    fi
 
-# Check file size
-file_size=$(stat -c%s "$glb_file" 2>/dev/null || stat -f%z "$glb_file" 2>/dev/null)
-if [[ $file_size -gt $max_size ]]; then
-    echo "Asset too large: $file_size bytes (max: $max_size)" >&2
-    exit 1
-fi
+    # Check file size
+    file_size=$(stat -c%s "$glb_file" 2>/dev/null || stat -f%z "$glb_file" 2>/dev/null)
+    if [[ $file_size -gt $max_size ]]; then
+        echo "Asset too large: $file_size bytes (max: $max_size)" >&2
+        exit 1
+    fi
 
-# Validate GLB structure using Python for binary parsing
-python3 - "$glb_file" << 'PYTHON_SCRIPT'
+    # Validate GLB structure using Python for binary parsing
+    python3 - "$glb_file" << 'PYTHON_SCRIPT'
 import sys
 import struct
 import json
@@ -112,5 +116,7 @@ if __name__ == '__main__':
     if not validate_glb(sys.argv[1]):
         sys.exit(1)
 PYTHON_SCRIPT
+
+done
 
 echo "Asset validation passed."

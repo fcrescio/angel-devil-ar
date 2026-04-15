@@ -41,9 +41,9 @@ class BootstrapStatusTest {
     fun placeholderCharacterUsesAppOwnedGrotesqueImp() {
         val profile = CharacterPresentationProfiles.Default
 
-        assertEquals("grotesque-shoulder-imp", profile.id)
-        assertEquals("models/grotesque_imp.glb", profile.asset.assetPath)
-        assertEquals("Grotesque Shoulder Imp", profile.asset.displayName)
+        assertEquals("trellis-winged-devil", profile.id)
+        assertEquals("models/trellis_winged_devil.glb", profile.asset.assetPath)
+        assertEquals("Trellis Winged Devil", profile.asset.displayName)
         assertEquals(CharacterAnimationIntent.Appearing, profile.initialAnimationIntent)
         assertEquals(profile.asset, CharacterModelNodeFactory.PlaceholderAsset)
     }
