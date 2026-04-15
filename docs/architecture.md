@@ -43,6 +43,11 @@ New runtime dependencies require a backlog task and, when they affect architectu
 
 The first AR host uses SceneView `ARSceneView` with `Session.Feature.FRONT_CAMERA` and ARCore Augmented Faces set to `MESH3D`. Plane finding and light estimation are disabled for this first selfie flow. The host reports session lifecycle and tracking status to Compose and attaches a small GLB placeholder model. On each AR frame, the character controller reads the tracked `AugmentedFace.centerPose`, applies a side-and-up offset intended to sit near shoulder/ear height, smooths movement, and updates the model node position.
 
+The devil presentation uses a warm front-low key light plus elevated indirect
+light. The Trellis asset has a naturally dark red/black texture, so the AR host
+keeps the light stronger than a neutral model would need while preserving the
+front-low horror read.
+
 ## Placement Baseline
 
 The current validated placement profile is `pixel7-ear-shoulder`:
