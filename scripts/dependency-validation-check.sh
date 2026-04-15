@@ -3,7 +3,7 @@ set -euo pipefail
 
 gradle_file="app/build.gradle.kts"
 expected_arcore_version="${EXPECTED_ARCORE_VERSION:-1.49.0}"
-expected_sceneview_version="${EXPECTED_SCENEVIEW_VERSION:-2.2.1}"
+expected_sceneview_version="${EXPECTED_SCENEVIEW_VERSION:-2.3.2}"
 
 if [[ ! -f "$gradle_file" ]]; then
   echo "Missing Gradle module file: $gradle_file" >&2

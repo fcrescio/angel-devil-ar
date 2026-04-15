@@ -46,12 +46,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-
     buildFeatures {
         compose = true
+    }
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -63,7 +65,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("com.google.ar:core:1.49.0")
-    implementation("io.github.sceneview:arsceneview:2.2.1")
+    implementation("io.github.sceneview:arsceneview:2.3.2")
     implementation("com.google.android.filament:filament-android:1.68.2")
     implementation("com.google.android.filament:filament-utils-android:1.68.2")
     implementation("com.google.android.filament:gltfio-android:1.68.2")
@@ -71,4 +73,17 @@ dependencies {
     debugImplementation("androidx.compose.ui:ui-tooling")
 
     testImplementation("junit:junit:4.13.2")
+}
+
+configurations.configureEach {
+    resolutionStrategy {
+        // SceneView 2.3.2 is the first 2.x release compiled against the static
+        // Filament Utils.init API used by 1.68.2. Keep AndroidX Core pinned
+        // until the project intentionally moves to compileSdk 36 / AGP 8.9+.
+        force("androidx.core:core:1.15.0")
+        force("androidx.core:core-ktx:1.15.0")
+        force("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.0")
+        force("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.0")
+    }
 }
