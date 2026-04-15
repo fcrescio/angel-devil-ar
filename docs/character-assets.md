@@ -69,3 +69,14 @@ Render a quick multi-angle contact sheet with:
 ```sh
 ./scripts/render-character-asset.py app/src/main/assets/models/grotesque_imp.glb --output /tmp/angel-asset-renders/contact.png
 ```
+
+Render skinned-joint diagnostics for assets with generic bone names:
+
+```sh
+./scripts/render-skinned-joint-sweep.py app/src/main/assets/models/trellis_winged_devil.glb --output-dir /tmp/angel-asset-renders/joint-sweep
+```
+
+The joint sweep overlays the neutral vertex cloud in gray with the exaggerated
+single-joint deformation in red across front, back, top, and bottom views. Use
+`summary.tsv` in the output directory to find the joints that influence the most
+vertices before mapping them to semantic body parts.
