@@ -43,16 +43,23 @@ class DevilRigAnimator(
         }
         if (rest.isEmpty()) return
 
+        val rotationsByJoint = pose.jointRotations.associateBy { it.jointIndex }
+
         transformManager.openLocalTransformTransaction()
-        pose.jointRotations.forEach { rotation ->
-            val entity = joints.getOrNull(rotation.jointIndex) ?: return@forEach
+        rest.forEach { (jointIndex, restTransform) ->
+            val entity = joints.getOrNull(jointIndex) ?: return@forEach
             if (!transformManager.hasComponent(entity)) return@forEach
 
             val instance = transformManager.getInstance(entity)
-            val restTransform = rest[rotation.jointIndex] ?: return@forEach
+            val rotation = rotationsByJoint[jointIndex]
+            val transform = if (rotation == null) {
+                restTransform
+            } else {
+                restTransform.multiply(rotation.toMatrix())
+            }
             transformManager.setTransform(
                 instance,
-                restTransform.multiply(rotation.toMatrix()),
+                transform,
             )
         }
         transformManager.commitLocalTransformTransaction()
