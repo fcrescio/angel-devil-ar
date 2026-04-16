@@ -31,6 +31,9 @@ class CompanionInteractionTest {
 
         assertEquals("greeted", state.cue.id)
         assertEquals(CompanionMood.Greeting, state.cue.mood)
+        assertEquals(2_200L, state.cue.durationMillis)
+        assertEquals(1, state.eventId)
+        assertEquals(1, state.manualActionStreak)
         assertFalse(state.voiceInputEnabled)
         assertFalse(state.llmResponseEnabled)
     }
@@ -44,6 +47,7 @@ class CompanionInteractionTest {
 
         assertEquals("provoked", state.cue.id)
         assertEquals(CompanionMood.Blocked, state.cue.mood)
+        assertEquals(2_800L, state.cue.durationMillis)
         assertTrue(state.cue.text.isNotBlank())
         assertFalse(state.voiceInputEnabled)
         assertFalse(state.llmResponseEnabled)
@@ -63,7 +67,69 @@ class CompanionInteractionTest {
 
         assertEquals("reassured", reassured.cue.id)
         assertEquals(CompanionMood.Calming, reassured.cue.mood)
+        assertEquals(2_000L, reassured.cue.durationMillis)
         assertFalse(reassured.voiceInputEnabled)
         assertFalse(reassured.llmResponseEnabled)
+    }
+
+    @Test
+    fun matchingCueExpiryReturnsTransientManualCueToPresent() {
+        val greeted = CompanionInteractionReducer.reduce(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.UserGreeted,
+        )
+
+        val settled = CompanionInteractionReducer.reduce(
+            current = greeted,
+            signal = CompanionSignal.CueExpired("greeted"),
+        )
+
+        assertEquals(CompanionCues.Present, settled.cue)
+        assertEquals(0, settled.manualActionStreak)
+        assertEquals(null, settled.lastManualActionId)
+        assertEquals(greeted.eventId + 1, settled.eventId)
+    }
+
+    @Test
+    fun staleCueExpiryDoesNotOverrideNewerState() {
+        val greeted = CompanionInteractionReducer.reduce(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.UserGreeted,
+        )
+        val searching = CompanionInteractionReducer.reduce(
+            current = greeted,
+            signal = CompanionSignal.FaceLost,
+        )
+
+        val afterStaleExpiry = CompanionInteractionReducer.reduce(
+            current = searching,
+            signal = CompanionSignal.CueExpired("greeted"),
+        )
+
+        assertEquals(searching, afterStaleExpiry)
+    }
+
+    @Test
+    fun repeatedManualActionEscalatesStreakAndCueText() {
+        val first = CompanionInteractionReducer.reduce(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.UserProvoked,
+        )
+        val second = CompanionInteractionReducer.reduce(
+            current = first,
+            signal = CompanionSignal.UserProvoked,
+        )
+        val third = CompanionInteractionReducer.reduce(
+            current = second,
+            signal = CompanionSignal.UserProvoked,
+        )
+
+        assertEquals(1, first.manualActionStreak)
+        assertEquals("Careful.", first.cue.text)
+        assertEquals(2, second.manualActionStreak)
+        assertEquals("Again?", second.cue.text)
+        assertEquals(3, third.manualActionStreak)
+        assertEquals("Enough.", third.cue.text)
+        assertTrue(third.summary.contains("streak: 3"))
     }
 }

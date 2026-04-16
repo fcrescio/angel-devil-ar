@@ -82,3 +82,10 @@ Manual greeting and reassurance use distinct companion moods so the character
 can react differently from the default idle loop. Greeting maps to a more active
 wing/body acknowledgement, reassurance maps to a quieter settling pose, and
 provocation keeps using the blocked/agitated reaction.
+
+Manual reactions are transient. Each manual cue carries a local duration and the
+Compose host sends a deterministic `CueExpired` signal when that duration ends.
+The reducer only accepts expiry for the currently active cue, so stale timers
+cannot override newer AR or user signals. Repeated taps on the same action build
+a small capped streak that can adjust local copy and is surfaced in the debug
+overlay together with the active interaction mood.

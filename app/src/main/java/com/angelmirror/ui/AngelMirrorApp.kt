@@ -47,12 +47,12 @@ import com.angelmirror.character.CharacterAnimationIntentMapper
 import com.angelmirror.character.CharacterPlacementDebugState
 import com.angelmirror.interaction.CompanionAction
 import com.angelmirror.interaction.CompanionActions
-import com.angelmirror.interaction.CompanionCue
 import com.angelmirror.interaction.CompanionInteractionReducer
 import com.angelmirror.interaction.CompanionInteractionState
 import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.permissions.CameraPermissionChecker
 import com.angelmirror.permissions.CameraPermissionState
+import kotlinx.coroutines.delay
 
 @Composable
 fun AngelMirrorApp() {
@@ -110,7 +110,7 @@ private fun ReadinessScreen() {
     if (isReadyForAr) {
         ArExperienceScreen(
             status = arSessionStatus,
-            companionCue = companionInteraction.cue,
+            companionInteraction = companionInteraction,
             placementDebug = placementDebug,
             onStatusChanged = {
                 arSessionStatus = it
@@ -154,7 +154,7 @@ private fun ReadinessScreen() {
 @Composable
 private fun ArExperienceScreen(
     status: ArSessionStatus,
-    companionCue: CompanionCue,
+    companionInteraction: CompanionInteractionState,
     placementDebug: CharacterPlacementDebugState?,
     onStatusChanged: (ArSessionStatus) -> Unit,
     onCompanionSignal: (CompanionSignal) -> Unit,
@@ -163,9 +163,16 @@ private fun ArExperienceScreen(
     var showDebug by remember {
         mutableStateOf(false)
     }
+    val companionCue = companionInteraction.cue
 
     val animationIntent = remember(companionCue.mood) {
         CharacterAnimationIntentMapper.fromMood(companionCue.mood)
+    }
+
+    LaunchedEffect(companionInteraction.eventId) {
+        val durationMillis = companionCue.durationMillis ?: return@LaunchedEffect
+        delay(durationMillis)
+        onCompanionSignal(CompanionSignal.CueExpired(companionCue.id))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -223,7 +230,7 @@ private fun ArExperienceScreen(
                 )
                 PlacementDebugOverlay(
                     modifier = Modifier.fillMaxWidth(),
-                    summary = debugStateWithAnimation.summary,
+                    summary = debugStateWithAnimation.summary + "\n" + companionInteraction.summary,
                 )
             }
             CompanionActionBar(

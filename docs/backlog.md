@@ -14,6 +14,9 @@
 ## Done
 
 - [x] B030 Add deterministic manual interaction quick actions.
+- [x] B031 Add transient expiry for manual companion reactions.
+- [x] B032 Add repeated-action streak handling for manual interaction.
+- [x] B033 Surface interaction state in the debug overlay.
 - [x] B001 Initialize Android project with Kotlin and Compose.
 - [x] B027 Add asset validation script and documentation check for app-owned GLB assets.
 - [x] B026 Polish debug overlay UI without changing placement or AR lifecycle.
