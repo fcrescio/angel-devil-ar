@@ -9,17 +9,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,6 +45,8 @@ import com.angelmirror.ar.ArHostView
 import com.angelmirror.ar.ArSessionStatus
 import com.angelmirror.character.CharacterAnimationIntentMapper
 import com.angelmirror.character.CharacterPlacementDebugState
+import com.angelmirror.interaction.CompanionAction
+import com.angelmirror.interaction.CompanionActions
 import com.angelmirror.interaction.CompanionCue
 import com.angelmirror.interaction.CompanionInteractionReducer
 import com.angelmirror.interaction.CompanionInteractionState
@@ -95,6 +100,13 @@ private fun ReadinessScreen() {
     val isReadyForAr = cameraPermission == CameraPermissionState.Granted &&
         arAvailability == ArAvailabilityState.Ready
 
+    val applyCompanionSignal: (CompanionSignal) -> Unit = { signal ->
+        companionInteraction = CompanionInteractionReducer.reduce(
+            current = companionInteraction,
+            signal = signal,
+        )
+    }
+
     if (isReadyForAr) {
         ArExperienceScreen(
             status = arSessionStatus,
@@ -102,13 +114,9 @@ private fun ReadinessScreen() {
             placementDebug = placementDebug,
             onStatusChanged = {
                 arSessionStatus = it
-                it.toCompanionSignal()?.let { signal ->
-                    companionInteraction = CompanionInteractionReducer.reduce(
-                        current = companionInteraction,
-                        signal = signal,
-                    )
-                }
+                it.toCompanionSignal()?.let(applyCompanionSignal)
             },
+            onCompanionSignal = applyCompanionSignal,
             onPlacementDebugChanged = {
                 placementDebug = it
             },
@@ -149,6 +157,7 @@ private fun ArExperienceScreen(
     companionCue: CompanionCue,
     placementDebug: CharacterPlacementDebugState?,
     onStatusChanged: (ArSessionStatus) -> Unit,
+    onCompanionSignal: (CompanionSignal) -> Unit,
     onPlacementDebugChanged: (CharacterPlacementDebugState) -> Unit,
 ) {
     var showDebug by remember {
@@ -200,18 +209,64 @@ private fun ArExperienceScreen(
                 )
             }
         }
-        if (showDebug && placementDebug != null) {
-            val debugStateWithAnimation = placementDebug.copy(
-                animationIntent = animationIntent,
+        Column(
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .fillMaxWidth()
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            if (showDebug && placementDebug != null) {
+                val debugStateWithAnimation = placementDebug.copy(
+                    animationIntent = animationIntent,
+                )
+                PlacementDebugOverlay(
+                    modifier = Modifier.fillMaxWidth(),
+                    summary = debugStateWithAnimation.summary,
+                )
+            }
+            CompanionActionBar(
+                actions = CompanionActions.QuickActions,
+                onAction = { action ->
+                    onCompanionSignal(action.signal)
+                },
             )
-            PlacementDebugOverlay(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .fillMaxWidth()
-                    .windowInsetsPadding(WindowInsets.navigationBars)
-                    .padding(12.dp),
-                summary = debugStateWithAnimation.summary,
+        }
+    }
+}
+
+@Composable
+private fun CompanionActionBar(
+    actions: List<CompanionAction>,
+    onAction: (CompanionAction) -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(
+                color = Color.Black.copy(alpha = 0.62f),
+                shape = RoundedCornerShape(8.dp),
             )
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        horizontalArrangement = Arrangement.Center,
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        actions.forEachIndexed { index, action ->
+            if (index > 0) {
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+            Button(
+                onClick = {
+                    onAction(action)
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF4A4A4A),
+                    contentColor = Color.White,
+                ),
+            ) {
+                Text(text = action.label)
+            }
         }
     }
 }

@@ -20,14 +20,43 @@ data class CompanionInteractionState(
     val llmResponseEnabled: Boolean = false,
 )
 
+data class CompanionAction(
+    val id: String,
+    val label: String,
+    val signal: CompanionSignal,
+)
+
 sealed interface CompanionSignal {
     data object ArSessionStarting : CompanionSignal
     data object CharacterPlaced : CompanionSignal
     data object FaceLost : CompanionSignal
     data object ArSessionPaused : CompanionSignal
+    data object UserGreeted : CompanionSignal
+    data object UserProvoked : CompanionSignal
+    data object UserReassured : CompanionSignal
     data class ArSessionFailed(
         val reason: String,
     ) : CompanionSignal
+}
+
+object CompanionActions {
+    val QuickActions = listOf(
+        CompanionAction(
+            id = "greet",
+            label = "Hey",
+            signal = CompanionSignal.UserGreeted,
+        ),
+        CompanionAction(
+            id = "provoke",
+            label = "Boo",
+            signal = CompanionSignal.UserProvoked,
+        ),
+        CompanionAction(
+            id = "reassure",
+            label = "Easy",
+            signal = CompanionSignal.UserReassured,
+        ),
+    )
 }
 
 object CompanionCues {
@@ -40,6 +69,24 @@ object CompanionCues {
     val Present = CompanionCue(
         id = "present",
         text = "I'm on your shoulder.",
+        mood = CompanionMood.Present,
+    )
+
+    val Greeted = CompanionCue(
+        id = "greeted",
+        text = "I see you.",
+        mood = CompanionMood.Present,
+    )
+
+    val Provoked = CompanionCue(
+        id = "provoked",
+        text = "Careful.",
+        mood = CompanionMood.Blocked,
+    )
+
+    val Reassured = CompanionCue(
+        id = "reassured",
+        text = "Easy.",
         mood = CompanionMood.Present,
     )
 
@@ -90,6 +137,24 @@ object CompanionInteractionReducer {
 
             CompanionSignal.ArSessionPaused -> current.copy(
                 cue = CompanionCues.Paused,
+                voiceInputEnabled = false,
+                llmResponseEnabled = false,
+            )
+
+            CompanionSignal.UserGreeted -> current.copy(
+                cue = CompanionCues.Greeted,
+                voiceInputEnabled = false,
+                llmResponseEnabled = false,
+            )
+
+            CompanionSignal.UserProvoked -> current.copy(
+                cue = CompanionCues.Provoked,
+                voiceInputEnabled = false,
+                llmResponseEnabled = false,
+            )
+
+            CompanionSignal.UserReassured -> current.copy(
+                cue = CompanionCues.Reassured,
                 voiceInputEnabled = false,
                 llmResponseEnabled = false,
             )

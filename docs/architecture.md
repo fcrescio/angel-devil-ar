@@ -71,3 +71,9 @@ The AR screen includes a lightweight debug overlay toggle that reports the activ
 ## Interaction Boundary
 
 The first interaction layer is intentionally local and deterministic. `CompanionInteractionReducer` accepts simple AR/character signals and returns a `CompanionInteractionState` containing the current cue, mood, and disabled voice/LLM flags. This gives future ASR/TTS/LLM work a stable app boundary without adding those systems to the AR rendering path.
+
+The first manual interaction surface is a bottom quick-action bar in the AR
+screen. It sends deterministic `CompanionSignal` values such as greeting,
+provocation, and reassurance into the same reducer used by AR lifecycle events.
+Those actions only change companion cue and mood; voice input and LLM responses
+remain explicitly disabled.

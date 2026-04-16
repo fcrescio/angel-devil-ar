@@ -13,6 +13,7 @@
 
 ## Done
 
+- [x] B030 Add deterministic manual interaction quick actions.
 - [x] B001 Initialize Android project with Kotlin and Compose.
 - [x] B027 Add asset validation script and documentation check for app-owned GLB assets.
 - [x] B026 Polish debug overlay UI without changing placement or AR lifecycle.
