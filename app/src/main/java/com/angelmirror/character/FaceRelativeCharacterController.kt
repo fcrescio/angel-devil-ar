@@ -24,9 +24,11 @@ class FaceRelativeCharacterController(
     var animationIntent: CharacterAnimationIntent = initialAnimationIntent
 
     fun update(frame: Frame): Boolean {
+        val elapsedSeconds = animationElapsedSeconds(frame.timestamp)
         val face = frame.getUpdatedTrackables(AugmentedFace::class.java)
             .firstOrNull { it.trackingState == TrackingState.TRACKING }
             ?: run {
+                applyAssetAnimation(elapsedSeconds)
                 onDebugStateChanged(debugState(tracking = false))
                 return false
             }
@@ -44,7 +46,6 @@ class FaceRelativeCharacterController(
             z = pose.tz(),
         )
         val smoothed = smooth(target)
-        val elapsedSeconds = animationElapsedSeconds(frame.timestamp)
         val animationPose = animator.poseAt(
             elapsedSeconds = elapsedSeconds,
             intent = animationIntent,
@@ -60,10 +61,7 @@ class FaceRelativeCharacterController(
             baseYawDegrees + animationPose.yawDegrees,
             animationPose.rollDegrees,
         )
-        assetAnimator.apply(
-            elapsedSeconds = elapsedSeconds,
-            intent = animationIntent,
-        )
+        applyAssetAnimation(elapsedSeconds)
         onDebugStateChanged(debugState(tracking = true))
 
         return true
@@ -84,6 +82,13 @@ class FaceRelativeCharacterController(
             firstAnimationTimestampNanos = it
         }
         return ((timestampNanos - firstTimestamp).coerceAtLeast(0L) / NanosPerSecond).toFloat()
+    }
+
+    private fun applyAssetAnimation(elapsedSeconds: Float) {
+        assetAnimator.apply(
+            elapsedSeconds = elapsedSeconds,
+            intent = animationIntent,
+        )
     }
 
     private fun smooth(target: ShoulderPlacement): ShoulderPlacement {
