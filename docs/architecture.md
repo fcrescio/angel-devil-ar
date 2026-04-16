@@ -46,7 +46,16 @@ The first AR host uses SceneView `ARSceneView` with `Session.Feature.FRONT_CAMER
 The devil presentation uses a warm front-low key light plus elevated indirect
 light. The Trellis asset has a naturally dark red/black texture, so the AR host
 keeps the light stronger than a neutral model would need while preserving the
-front-low horror read.
+front-low horror read. The same presentation profile also carries the asset
+orientation correction: the Trellis mesh is yawed `180` degrees at runtime so
+its face, not its tail and wings, points toward the selfie camera.
+
+The Trellis devil uses a runtime procedural rig animator for the current motion
+vocabulary. `DevilProceduralMotion` owns the deterministic pose curves for
+`Appearing`, `Idle`, `Searching`, `Blocked`, and `Paused`; `DevilRigAnimator`
+applies those poses to the validated wing and tail joint subset. This remains a
+temporary asset-specific layer until the project has a curated rig with authored
+GLB animation clips.
 
 ## Placement Baseline
 

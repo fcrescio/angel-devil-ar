@@ -45,6 +45,7 @@ class BootstrapStatusTest {
         assertEquals("models/trellis_winged_devil.glb", profile.asset.assetPath)
         assertEquals("Trellis Winged Devil", profile.asset.displayName)
         assertEquals(CharacterAnimationIntent.Appearing, profile.initialAnimationIntent)
+        assertEquals(180.0f, profile.assetYawCorrectionDegrees, 0.001f)
         assertEquals(profile.asset, CharacterModelNodeFactory.PlaceholderAsset)
     }
 

@@ -5,6 +5,7 @@ data class CharacterPresentationProfile(
     val asset: CharacterAsset,
     val lighting: CharacterLightingProfile,
     val initialAnimationIntent: CharacterAnimationIntent,
+    val assetYawCorrectionDegrees: Float = 0.0f,
 )
 
 object CharacterPresentationProfiles {
@@ -22,6 +23,7 @@ object CharacterPresentationProfiles {
             castsShadows = false,
         ),
         initialAnimationIntent = CharacterAnimationIntent.Appearing,
+        assetYawCorrectionDegrees = 180.0f,
     )
 
     val Default = Devil

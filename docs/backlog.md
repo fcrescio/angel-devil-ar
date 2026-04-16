@@ -21,6 +21,8 @@
 - [x] B021 Add character animation intent boundary.
 - [x] B022 Add pure Kotlin placement smoothing/math tests.
 - [x] B023 Surface character animation intent in debug state.
+- [x] B028 Add first Trellis devil idle rig animation.
+- [x] B029 Add first procedural appearing/searching/blocked devil poses.
 - [x] B024 Add app-owned grotesque imp placeholder asset.
 - [x] B025 Add lightweight AR diagnostic log model (debug-only, pure Kotlin).
 - [x] B002 Add package skeleton for app/ui/ar/tracking/character/permissions/util.

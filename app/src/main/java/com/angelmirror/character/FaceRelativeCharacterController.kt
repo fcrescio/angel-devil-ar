@@ -11,8 +11,10 @@ import io.github.sceneview.node.ModelNode
 class FaceRelativeCharacterController(
     private val modelNode: ModelNode,
     private val profile: CharacterPlacementProfile = CharacterPlacementProfiles.Default,
+    private val baseYawDegrees: Float = 0.0f,
     initialAnimationIntent: CharacterAnimationIntent = CharacterAnimationIntent.Idle,
     private val animator: CharacterProceduralAnimator = CharacterProceduralAnimator(),
+    private val assetAnimator: CharacterAssetAnimator = NoopCharacterAssetAnimator,
     private val onDebugStateChanged: (CharacterPlacementDebugState) -> Unit = {},
 ) {
     private var lastPlacement: ShoulderPlacement? = null
@@ -42,8 +44,9 @@ class FaceRelativeCharacterController(
             z = pose.tz(),
         )
         val smoothed = smooth(target)
+        val elapsedSeconds = animationElapsedSeconds(frame.timestamp)
         val animationPose = animator.poseAt(
-            elapsedSeconds = animationElapsedSeconds(frame.timestamp),
+            elapsedSeconds = elapsedSeconds,
             intent = animationIntent,
         )
 
@@ -54,8 +57,12 @@ class FaceRelativeCharacterController(
         )
         modelNode.rotation = Float3(
             animationPose.pitchDegrees,
-            animationPose.yawDegrees,
+            baseYawDegrees + animationPose.yawDegrees,
             animationPose.rollDegrees,
+        )
+        assetAnimator.apply(
+            elapsedSeconds = elapsedSeconds,
+            intent = animationIntent,
         )
         onDebugStateChanged(debugState(tracking = true))
 

@@ -13,6 +13,7 @@ import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.CharacterPlacementDebugState
 import com.angelmirror.character.CharacterPlacementProfiles
 import com.angelmirror.character.CharacterPresentationProfiles
+import com.angelmirror.character.DevilRigAnimator
 import com.angelmirror.character.FaceRelativeCharacterController
 import io.github.sceneview.ar.ARSceneView
 
@@ -96,7 +97,9 @@ fun ArHostView(
                 characterControllerRef[0] = FaceRelativeCharacterController(
                     modelNode = characterNode,
                     profile = profile,
+                    baseYawDegrees = presentationProfile.assetYawCorrectionDegrees,
                     initialAnimationIntent = presentationProfile.initialAnimationIntent,
+                    assetAnimator = DevilRigAnimator(characterNode),
                     onDebugStateChanged = onPlacementDebugChanged,
                 )
                 addChildNode(characterNode)

@@ -6,6 +6,11 @@
 
 It is a Trellis-generated winged devil model provided as `mesh.glb` and imported into the app as `trellis_winged_devil.glb`. It contains a textured skinned mesh with joints and weights, but no authored animation clips yet. The joint names are still generic (`joint_0`, `joint_1`, ...), so runtime bone animation needs a later mapping pass before it can target head, wings, or tail reliably.
 
+In SceneView AR placement, this Trellis mesh loads facing away from the selfie
+camera. The devil presentation profile applies a `180` degree yaw correction so
+the same asset reads face-first while keeping procedural pitch, yaw, and roll
+animation layered on top.
+
 The previous app-owned procedural placeholder remains in the repository for fallback/reference:
 
 `app/src/main/assets/models/grotesque_imp.glb`

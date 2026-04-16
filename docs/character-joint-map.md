@@ -44,8 +44,8 @@ expressive runtime animation because they affect too much of the body.
 | `joint_19` / `joint_20` | upper torso/shoulder mass | Medium | Same influence center near upper body; good candidate for breathing/idle sway experiments. |
 | `joint_14` | right upper appendage/wing-side region | Medium | High influence center, right side in front view. |
 | `joint_27` / `joint_32` | left upper appendage/wing-side region | Medium | Mirrors the right-side upper region more than most other joints. |
-| `joint_16` / `joint_11` / `joint_8` | right side limb or wing chain | Medium | Strong right-side deformation; may include wing and arm due mixed weights. |
-| `joint_25` / `joint_31` / `joint_36` | left side limb or wing chain | Medium | Strong left-side deformation; likely mirror chain for `joint_16`/`joint_11`/`joint_8`. |
+| `joint_16` / `joint_11` / `joint_8` | right arm-side chain | Medium | Strong right-side deformation; device testing showed these read as arm motion, not wing motion. |
+| `joint_25` / `joint_31` / `joint_36` | left arm-side chain | Medium | Strong left-side deformation; device testing showed these read as arm motion, not wing motion. |
 | `joint_24` / `joint_26` / `joint_29` / `joint_40` | tail or lower/back appendage | Medium | Best candidates for tail motion; top view shows long back/lower extension. |
 | `joint_0` through `joint_6` | small right lower chain | Low | Localized and low movement; likely distal limb/foot/detail joints. |
 | `joint_38` through `joint_45` | small left lower chain | Low | Localized and low movement; likely distal limb/foot/detail joints. |
@@ -59,10 +59,37 @@ a whole.
 Safer first tests:
 
 - idle torso pulse: `joint_19` or `joint_20` with a very small angle.
-- wing/arm twitch: one side from `joint_14`/`joint_16`, mirrored against
-  `joint_27`/`joint_31`.
+- wing twitch: one side from `joint_14`/`joint_9`, mirrored against
+  `joint_27`/`joint_32`.
 - tail twitch: `joint_24`, `joint_26`, or `joint_29`, with visual verification
   on device.
+
+## Runtime Idle Animation Pass
+
+The current runtime idle pass uses the following conservative subset:
+
+| Runtime Role | Joint |
+| --- | --- |
+| right wing root | `joint_14` |
+| right wing tip | `joint_9` |
+| left wing root | `joint_27` |
+| left wing tip | `joint_32` |
+| tail root | `joint_24` |
+| tail mid | `joint_26` |
+| tail tip | `joint_29` |
+
+`DevilProceduralMotion` drives an asymmetric idle wing flap, a lagged wing-tip
+response, a slower tail curl, and a subtle breathing scale. The wing cycle
+intentionally avoids a plain sine wave: opening is slower than closing, the tips
+trail the roots, and each cycle has a small deterministic amplitude variation.
+It also defines first-pass procedural poses for appearing, searching, and
+blocked states using the same validated wing and tail joints.
+`DevilRigAnimator` applies those rotations to Filament joint entities at runtime
+and calls `Animator.updateBoneMatrices()` afterward.
+This is still a provisional Trellis-specific map. The first device test showed
+`joint_16`/`joint_11` and `joint_31`/`joint_36` moving arms instead of wings, so
+the runtime pass now uses the higher wing-side `joint_14`/`joint_9` and
+`joint_27`/`joint_32` chains.
 
 The next refinement should render axis sweeps (`x`, `y`, `z`) for the safest
 candidates, because the current diagnostic uses one default axis and a joint can

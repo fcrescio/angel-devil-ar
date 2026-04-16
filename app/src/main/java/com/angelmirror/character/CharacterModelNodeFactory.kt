@@ -1,5 +1,6 @@
 package com.angelmirror.character
 
+import dev.romainguy.kotlin.math.Float3
 import io.github.sceneview.ar.ARSceneView
 import io.github.sceneview.math.Position
 import io.github.sceneview.node.ModelNode
@@ -24,6 +25,11 @@ object CharacterModelNodeFactory {
                 x = profile.offset.horizontalMeters,
                 y = profile.offset.verticalMeters,
                 z = -0.7f,
+            )
+            rotation = Float3(
+                0.0f,
+                presentationProfile.assetYawCorrectionDegrees,
+                0.0f,
             )
             isShadowCaster = false
             isShadowReceiver = false
