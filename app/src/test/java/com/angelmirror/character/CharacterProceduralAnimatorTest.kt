@@ -34,6 +34,36 @@ class CharacterProceduralAnimatorTest {
     }
 
     @Test
+    fun greetingAnimationReadsAsMoreActiveThanIdle() {
+        val idle = animator.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Idle,
+        )
+        val greeting = animator.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Greeting,
+        )
+
+        assertTrue(greeting.verticalOffsetMeters > idle.verticalOffsetMeters)
+        assertTrue(kotlin.math.abs(greeting.rollDegrees) > kotlin.math.abs(idle.rollDegrees))
+    }
+
+    @Test
+    fun calmingAnimationReadsAsLowerAndQuieterThanIdle() {
+        val idle = animator.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Idle,
+        )
+        val calming = animator.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Calming,
+        )
+
+        assertTrue(calming.verticalOffsetMeters < idle.verticalOffsetMeters)
+        assertTrue(kotlin.math.abs(calming.yawDegrees) < kotlin.math.abs(idle.yawDegrees))
+    }
+
+    @Test
     fun pausedAnimationIsStill() {
         val pose = animator.poseAt(
             elapsedSeconds = 3.2f,

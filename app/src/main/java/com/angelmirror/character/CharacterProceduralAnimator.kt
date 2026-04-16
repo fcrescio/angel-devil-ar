@@ -11,8 +11,10 @@ class CharacterProceduralAnimator {
         return when (intent) {
             CharacterAnimationIntent.Appearing -> appear(elapsedSeconds)
             CharacterAnimationIntent.Idle -> idle(elapsedSeconds)
+            CharacterAnimationIntent.Greeting -> greeting(elapsedSeconds)
             CharacterAnimationIntent.Searching -> searching(elapsedSeconds)
             CharacterAnimationIntent.Blocked -> blocked(elapsedSeconds)
+            CharacterAnimationIntent.Calming -> calming(elapsedSeconds)
             CharacterAnimationIntent.Paused -> CharacterAnimationPose()
         }
     }
@@ -36,6 +38,17 @@ class CharacterProceduralAnimator {
         )
     }
 
+    private fun greeting(elapsedSeconds: Float): CharacterAnimationPose {
+        val wave = sin(elapsedSeconds * TwoPi * 1.2f)
+        val bounce = sin(elapsedSeconds * TwoPi * 2.4f)
+        return CharacterAnimationPose(
+            verticalOffsetMeters = 0.014f + (bounce * 0.006f),
+            pitchDegrees = -6.0f + (bounce * 1.5f),
+            yawDegrees = wave * 7.0f,
+            rollDegrees = wave * 5.0f,
+        )
+    }
+
     private fun searching(elapsedSeconds: Float): CharacterAnimationPose {
         val scan = sin(elapsedSeconds * TwoPi * 0.95f)
         val bob = sin(elapsedSeconds * TwoPi * 1.4f)
@@ -43,6 +56,16 @@ class CharacterProceduralAnimator {
             verticalOffsetMeters = bob * 0.006f,
             yawDegrees = scan * 12.0f,
             rollDegrees = -scan * 4.0f,
+        )
+    }
+
+    private fun calming(elapsedSeconds: Float): CharacterAnimationPose {
+        val breath = sin(elapsedSeconds * TwoPi * 0.42f)
+        return CharacterAnimationPose(
+            verticalOffsetMeters = -0.004f + (breath * 0.003f),
+            pitchDegrees = 3.0f,
+            yawDegrees = breath * 1.2f,
+            rollDegrees = breath * 0.8f,
         )
     }
 

@@ -135,12 +135,20 @@ class BootstrapStatusTest {
             CharacterAnimationIntentMapper.fromMood(CompanionMood.Present),
         )
         assertEquals(
+            CharacterAnimationIntent.Greeting,
+            CharacterAnimationIntentMapper.fromMood(CompanionMood.Greeting),
+        )
+        assertEquals(
             CharacterAnimationIntent.Searching,
             CharacterAnimationIntentMapper.fromMood(CompanionMood.Searching),
         )
         assertEquals(
             CharacterAnimationIntent.Blocked,
             CharacterAnimationIntentMapper.fromMood(CompanionMood.Blocked),
+        )
+        assertEquals(
+            CharacterAnimationIntent.Calming,
+            CharacterAnimationIntentMapper.fromMood(CompanionMood.Calming),
         )
         assertEquals(
             CharacterAnimationIntent.Paused,

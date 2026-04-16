@@ -91,6 +91,45 @@ class DevilProceduralMotionTest {
     }
 
     @Test
+    fun greetingLiftsOneWingMoreThanIdle() {
+        val idle = motion.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Idle,
+        )
+        val greeting = motion.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Greeting,
+        )
+
+        assertTrue(
+            greeting.rotationFor(DevilProceduralMotion.RightWingRootJoint) >
+                idle.rotationFor(DevilProceduralMotion.RightWingRootJoint),
+        )
+        assertTrue(greeting.bodyScaleY > idle.bodyScaleY)
+        assertTrue(greeting.jointRotations.none { it.jointIndex in ArmJointCandidates })
+    }
+
+    @Test
+    fun calmingFoldsWingsAndQuietlySettlesTail() {
+        val idle = motion.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Idle,
+        )
+        val calming = motion.poseAt(
+            elapsedSeconds = 0.25f,
+            intent = CharacterAnimationIntent.Calming,
+        )
+
+        assertTrue(calming.rotationFor(DevilProceduralMotion.RightWingRootJoint) < 0.0f)
+        assertTrue(calming.rotationFor(DevilProceduralMotion.LeftWingRootJoint) > 0.0f)
+        assertTrue(
+            kotlin.math.abs(calming.rotationFor(DevilProceduralMotion.TailRootJoint)) <
+                kotlin.math.abs(idle.rotationFor(DevilProceduralMotion.TailRootJoint)),
+        )
+        assertTrue(calming.jointRotations.none { it.jointIndex in ArmJointCandidates })
+    }
+
+    @Test
     fun blockedFoldsWingsAndKeepsTailActive() {
         val pose = motion.poseAt(
             elapsedSeconds = 0.25f,

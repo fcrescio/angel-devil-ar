@@ -23,14 +23,14 @@ class CompanionInteractionTest {
     }
 
     @Test
-    fun userGreetingKeepsCompanionPresentWithoutVoiceOrLlm() {
+    fun userGreetingTriggersGreetingMoodWithoutVoiceOrLlm() {
         val state = CompanionInteractionReducer.reduce(
             current = CompanionInteractionState(),
             signal = CompanionSignal.UserGreeted,
         )
 
         assertEquals("greeted", state.cue.id)
-        assertEquals(CompanionMood.Present, state.cue.mood)
+        assertEquals(CompanionMood.Greeting, state.cue.mood)
         assertFalse(state.voiceInputEnabled)
         assertFalse(state.llmResponseEnabled)
     }
@@ -50,7 +50,7 @@ class CompanionInteractionTest {
     }
 
     @Test
-    fun userReassuranceReturnsCompanionToPresentMood() {
+    fun userReassuranceTriggersCalmingMood() {
         val provoked = CompanionInteractionReducer.reduce(
             current = CompanionInteractionState(),
             signal = CompanionSignal.UserProvoked,
@@ -62,7 +62,7 @@ class CompanionInteractionTest {
         )
 
         assertEquals("reassured", reassured.cue.id)
-        assertEquals(CompanionMood.Present, reassured.cue.mood)
+        assertEquals(CompanionMood.Calming, reassured.cue.mood)
         assertFalse(reassured.voiceInputEnabled)
         assertFalse(reassured.llmResponseEnabled)
     }

@@ -77,3 +77,8 @@ screen. It sends deterministic `CompanionSignal` values such as greeting,
 provocation, and reassurance into the same reducer used by AR lifecycle events.
 Those actions only change companion cue and mood; voice input and LLM responses
 remain explicitly disabled.
+
+Manual greeting and reassurance use distinct companion moods so the character
+can react differently from the default idle loop. Greeting maps to a more active
+wing/body acknowledgement, reassurance maps to a quieter settling pose, and
+provocation keeps using the blocked/agitated reaction.

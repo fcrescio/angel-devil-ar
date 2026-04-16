@@ -3,8 +3,10 @@ package com.angelmirror.interaction
 enum class CompanionMood {
     WarmingUp,
     Present,
+    Greeting,
     Searching,
     Blocked,
+    Calming,
     Paused,
 }
 
@@ -75,7 +77,7 @@ object CompanionCues {
     val Greeted = CompanionCue(
         id = "greeted",
         text = "I see you.",
-        mood = CompanionMood.Present,
+        mood = CompanionMood.Greeting,
     )
 
     val Provoked = CompanionCue(
@@ -87,7 +89,7 @@ object CompanionCues {
     val Reassured = CompanionCue(
         id = "reassured",
         text = "Easy.",
-        mood = CompanionMood.Present,
+        mood = CompanionMood.Calming,
     )
 
     val FindFace = CompanionCue(
