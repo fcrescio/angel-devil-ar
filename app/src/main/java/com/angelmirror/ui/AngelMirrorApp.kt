@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -202,7 +203,8 @@ private fun ArExperienceScreen(
         ArHostView(
             modifier = Modifier
                 .align(Alignment.Center)
-                .fillMaxSize(ArPreviewFillFraction),
+                .fillMaxWidth()
+                .aspectRatio(ArPreviewAspectRatio),
             animationDirective = animationDirective,
             onStatusChanged = onStatusChanged,
             onPlacementDebugChanged = onPlacementDebugChanged,
@@ -261,7 +263,7 @@ private fun ArExperienceScreen(
                         companionInteraction.summary +
                         "\nexpiry: ${companionReactionExpiry?.delayMillis ?: "persistent"}" +
                         "\nintensity: ${animationDirective.clampedIntensity}" +
-                        "\npreview: ${(ArPreviewFillFraction * 100).toInt()}%" +
+                        "\npreview: camera aspect fit" +
                         "\n${BuildInfo.DisplayBuild}",
                 )
             }
@@ -345,7 +347,7 @@ private fun PlacementDebugOverlay(
     }
 }
 
-private const val ArPreviewFillFraction = 0.9f
+private const val ArPreviewAspectRatio = 9f / 16f
 
 private fun ArSessionStatus.toCompanionSignal(): CompanionSignal? {
     return when (this) {
