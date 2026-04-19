@@ -194,9 +194,15 @@ private fun ArExperienceScreen(
         onCompanionSignal(CompanionSignal.CueExpired(expiry.cueId))
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Black),
+    ) {
         ArHostView(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxSize(ArPreviewFillFraction),
             animationDirective = animationDirective,
             onStatusChanged = onStatusChanged,
             onPlacementDebugChanged = onPlacementDebugChanged,
@@ -255,6 +261,7 @@ private fun ArExperienceScreen(
                         companionInteraction.summary +
                         "\nexpiry: ${companionReactionExpiry?.delayMillis ?: "persistent"}" +
                         "\nintensity: ${animationDirective.clampedIntensity}" +
+                        "\npreview: ${(ArPreviewFillFraction * 100).toInt()}%" +
                         "\n${BuildInfo.DisplayBuild}",
                 )
             }
@@ -337,6 +344,8 @@ private fun PlacementDebugOverlay(
         )
     }
 }
+
+private const val ArPreviewFillFraction = 0.9f
 
 private fun ArSessionStatus.toCompanionSignal(): CompanionSignal? {
     return when (this) {

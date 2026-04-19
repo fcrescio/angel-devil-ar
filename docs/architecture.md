@@ -51,6 +51,11 @@ highest FPS as tie breakers. This is intended to reduce device-default selfie
 crop where possible; some devices may still expose only a single front-camera
 field of view through ARCore.
 
+The AR preview is rendered as a centered inset inside a black full-screen host.
+This is a UI-level dezoom, not a physical camera FOV change: camera texture and
+AR content are reduced together so the character remains aligned with the
+camera feed while avoiding an edge-to-edge selfie crop feel.
+
 The devil presentation uses a warm front-low key light plus elevated indirect
 light. The Trellis asset has a naturally dark red/black texture, so the AR host
 keeps the light stronger than a neutral model would need while preserving the
