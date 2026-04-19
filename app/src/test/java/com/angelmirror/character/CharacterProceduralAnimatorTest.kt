@@ -72,4 +72,25 @@ class CharacterProceduralAnimatorTest {
 
         assertEquals(CharacterAnimationPose(), pose)
     }
+
+    @Test
+    fun blockedAnimationScalesWithReactionIntensity() {
+        val low = animator.poseAt(
+            elapsedSeconds = 0.25f,
+            directive = CharacterAnimationDirective(
+                intent = CharacterAnimationIntent.Blocked,
+                intensity = 1,
+            ),
+        )
+        val high = animator.poseAt(
+            elapsedSeconds = 0.25f,
+            directive = CharacterAnimationDirective(
+                intent = CharacterAnimationIntent.Blocked,
+                intensity = 3,
+            ),
+        )
+
+        assertTrue(kotlin.math.abs(high.rollDegrees) > kotlin.math.abs(low.rollDegrees))
+        assertTrue(kotlin.math.abs(high.verticalOffsetMeters) > kotlin.math.abs(low.verticalOffsetMeters))
+    }
 }

@@ -83,9 +83,21 @@ can react differently from the default idle loop. Greeting maps to a more active
 wing/body acknowledgement, reassurance maps to a quieter settling pose, and
 provocation keeps using the blocked/agitated reaction.
 
-Manual reactions are transient. Each manual cue carries a local duration and the
-Compose host sends a deterministic `CueExpired` signal when that duration ends.
-The reducer only accepts expiry for the currently active cue, so stale timers
-cannot override newer AR or user signals. Repeated taps on the same action build
-a small capped streak that can adjust local copy and is surfaced in the debug
-overlay together with the active interaction mood.
+Manual reactions are transient. Each manual cue carries a local duration and
+`CompanionReactionEngine` returns the expiry request that the Compose host should
+schedule. The reducer only accepts expiry for the currently active cue, so stale
+timers cannot override newer AR or user signals. Repeated taps on the same
+action build a small capped streak that adjusts local copy and is surfaced in
+the debug overlay together with the active interaction mood.
+
+The character layer receives a `CharacterAnimationDirective` rather than only a
+raw intent. The directive carries a clamped reaction intensity derived from the
+manual-action streak, allowing `Boo` level 2/3 to increase body twitch and tail
+motion while keeping the shoulder placement stable. Greeting and calming also
+read the directive, but stay within smaller motion bounds.
+
+Debug builds expose the git short hash through `BuildInfo`, display it in the
+readiness and AR overlays, and set `versionName` to include the same hash. The
+local install script builds a debug APK for the current commit and checks the
+installed `versionName` when a device is available. GitHub Actions uploads the
+debug APK artifact with the commit short hash in the artifact name.

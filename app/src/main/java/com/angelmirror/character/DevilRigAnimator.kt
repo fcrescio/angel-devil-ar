@@ -13,11 +13,11 @@ class DevilRigAnimator(
 
     override fun apply(
         elapsedSeconds: Float,
-        intent: CharacterAnimationIntent,
+        directive: CharacterAnimationDirective,
     ) {
         val pose = motion.poseAt(
             elapsedSeconds = elapsedSeconds,
-            intent = intent,
+            directive = directive,
         )
         applyBodyScale(pose)
         applyJointRotations(pose)

@@ -6,17 +6,28 @@ import kotlin.math.sin
 class CharacterProceduralAnimator {
     fun poseAt(
         elapsedSeconds: Float,
-        intent: CharacterAnimationIntent,
+        directive: CharacterAnimationDirective,
     ): CharacterAnimationPose {
-        return when (intent) {
+        val intensity = directive.intensityScale()
+        return when (directive.intent) {
             CharacterAnimationIntent.Appearing -> appear(elapsedSeconds)
             CharacterAnimationIntent.Idle -> idle(elapsedSeconds)
-            CharacterAnimationIntent.Greeting -> greeting(elapsedSeconds)
+            CharacterAnimationIntent.Greeting -> greeting(elapsedSeconds, intensity)
             CharacterAnimationIntent.Searching -> searching(elapsedSeconds)
-            CharacterAnimationIntent.Blocked -> blocked(elapsedSeconds)
-            CharacterAnimationIntent.Calming -> calming(elapsedSeconds)
+            CharacterAnimationIntent.Blocked -> blocked(elapsedSeconds, intensity)
+            CharacterAnimationIntent.Calming -> calming(elapsedSeconds, intensity)
             CharacterAnimationIntent.Paused -> CharacterAnimationPose()
         }
+    }
+
+    fun poseAt(
+        elapsedSeconds: Float,
+        intent: CharacterAnimationIntent,
+    ): CharacterAnimationPose {
+        return poseAt(
+            elapsedSeconds = elapsedSeconds,
+            directive = CharacterAnimationDirective(intent = intent),
+        )
     }
 
     private fun appear(elapsedSeconds: Float): CharacterAnimationPose {
@@ -38,14 +49,17 @@ class CharacterProceduralAnimator {
         )
     }
 
-    private fun greeting(elapsedSeconds: Float): CharacterAnimationPose {
+    private fun greeting(
+        elapsedSeconds: Float,
+        intensity: Float,
+    ): CharacterAnimationPose {
         val wave = sin(elapsedSeconds * TwoPi * 1.2f)
         val bounce = sin(elapsedSeconds * TwoPi * 2.4f)
         return CharacterAnimationPose(
-            verticalOffsetMeters = 0.014f + (bounce * 0.006f),
+            verticalOffsetMeters = 0.012f + (intensity * 0.004f) + (bounce * 0.005f * intensity),
             pitchDegrees = -6.0f + (bounce * 1.5f),
-            yawDegrees = wave * 7.0f,
-            rollDegrees = wave * 5.0f,
+            yawDegrees = wave * 6.0f * intensity,
+            rollDegrees = wave * 4.5f * intensity,
         )
     }
 
@@ -59,23 +73,36 @@ class CharacterProceduralAnimator {
         )
     }
 
-    private fun calming(elapsedSeconds: Float): CharacterAnimationPose {
+    private fun calming(
+        elapsedSeconds: Float,
+        intensity: Float,
+    ): CharacterAnimationPose {
         val breath = sin(elapsedSeconds * TwoPi * 0.42f)
+        val settle = 1.0f / intensity
         return CharacterAnimationPose(
-            verticalOffsetMeters = -0.004f + (breath * 0.003f),
+            verticalOffsetMeters = -0.004f - ((intensity - 1.0f) * 0.002f) + (breath * 0.003f * settle),
             pitchDegrees = 3.0f,
-            yawDegrees = breath * 1.2f,
-            rollDegrees = breath * 0.8f,
+            yawDegrees = breath * 1.2f * settle,
+            rollDegrees = breath * 0.8f * settle,
         )
     }
 
-    private fun blocked(elapsedSeconds: Float): CharacterAnimationPose {
+    private fun blocked(
+        elapsedSeconds: Float,
+        intensity: Float,
+    ): CharacterAnimationPose {
         val twitch = sin(elapsedSeconds * TwoPi * 2.4f)
+        val snap = sin(elapsedSeconds * TwoPi * 4.2f)
         return CharacterAnimationPose(
-            verticalOffsetMeters = twitch * 0.004f,
-            pitchDegrees = 6.0f,
-            rollDegrees = twitch * 6.0f,
+            verticalOffsetMeters = (twitch * 0.0035f * intensity) + (snap * 0.0015f * (intensity - 1.0f)),
+            pitchDegrees = 5.0f + intensity,
+            yawDegrees = snap * 2.0f * (intensity - 1.0f),
+            rollDegrees = twitch * 5.5f * intensity,
         )
+    }
+
+    private fun CharacterAnimationDirective.intensityScale(): Float {
+        return 1.0f + ((clampedIntensity - 1) * 0.35f)
     }
 
     private companion object {

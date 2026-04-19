@@ -19,6 +19,9 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      - name: Derive short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> "$GITHUB_ENV"
+
       - name: Validate AR dependencies
         run: ./scripts/dependency-validation-check.sh
 
@@ -34,7 +37,7 @@ jobs:
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
         with:
-          name: angel-mirror-debug-apk
+          name: angel-mirror-debug-${{ env.SHORT_SHA }}
           path: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Unit tests

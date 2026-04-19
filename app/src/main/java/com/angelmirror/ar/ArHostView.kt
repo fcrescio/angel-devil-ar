@@ -7,7 +7,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
-import com.angelmirror.character.CharacterAnimationIntent
+import com.angelmirror.character.CharacterAnimationDirective
 import com.angelmirror.character.CharacterLighting
 import com.angelmirror.character.CharacterModelNodeFactory
 import com.angelmirror.character.CharacterPlacementDebugState
@@ -20,12 +20,14 @@ import io.github.sceneview.ar.ARSceneView
 @Composable
 fun ArHostView(
     modifier: Modifier = Modifier,
-    animationIntent: CharacterAnimationIntent = CharacterPresentationProfiles.Default.initialAnimationIntent,
+    animationDirective: CharacterAnimationDirective = CharacterAnimationDirective(
+        intent = CharacterPresentationProfiles.Default.initialAnimationIntent,
+    ),
     onStatusChanged: (ArSessionStatus) -> Unit,
     onPlacementDebugChanged: (CharacterPlacementDebugState) -> Unit = {},
 ) {
     val context = LocalContext.current
-    val latestAnimationIntent = rememberUpdatedState(animationIntent)
+    val latestAnimationDirective = rememberUpdatedState(animationDirective)
     val characterControllerRef = remember {
         arrayOfNulls<FaceRelativeCharacterController>(1)
     }
@@ -68,7 +70,7 @@ fun ArHostView(
                 }
             },
             onSessionUpdated = { _, frame ->
-                characterControllerRef[0]?.animationIntent = latestAnimationIntent.value
+                characterControllerRef[0]?.animationDirective = latestAnimationDirective.value
                 val didUpdate = characterControllerRef[0]?.update(frame) == true
                 if (didUpdate) {
                     faceMissingFrameCount = 0
@@ -127,7 +129,7 @@ fun ArHostView(
         modifier = modifier,
         factory = { sceneView },
         update = {
-            characterControllerRef[0]?.animationIntent = latestAnimationIntent.value
+            characterControllerRef[0]?.animationDirective = latestAnimationDirective.value
         },
     )
 }

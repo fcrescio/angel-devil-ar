@@ -3,13 +3,13 @@ package com.angelmirror.character
 interface CharacterAssetAnimator {
     fun apply(
         elapsedSeconds: Float,
-        intent: CharacterAnimationIntent,
+        directive: CharacterAnimationDirective,
     )
 }
 
 object NoopCharacterAssetAnimator : CharacterAssetAnimator {
     override fun apply(
         elapsedSeconds: Float,
-        intent: CharacterAnimationIntent,
+        directive: CharacterAnimationDirective,
     ) = Unit
 }

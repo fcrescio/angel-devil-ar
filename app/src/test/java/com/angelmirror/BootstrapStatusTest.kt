@@ -165,6 +165,26 @@ class BootstrapStatusTest {
     }
 
     @Test
+    fun characterAnimationDirectiveCarriesManualReactionIntensity() {
+        val first = CompanionInteractionReducer.reduce(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.UserProvoked,
+        )
+        val second = CompanionInteractionReducer.reduce(
+            current = first,
+            signal = CompanionSignal.UserProvoked,
+        )
+        val state = CompanionInteractionReducer.reduce(
+            current = second,
+            signal = CompanionSignal.UserProvoked,
+        )
+        val directive = CharacterAnimationIntentMapper.fromInteractionState(state)
+
+        assertEquals(CharacterAnimationIntent.Blocked, directive.intent)
+        assertEquals(3, directive.clampedIntensity)
+    }
+
+    @Test
     fun defaultPlacementProfileKeepsValidatedPixel7Offsets() {
         val profile = CharacterPlacementProfiles.Default
 

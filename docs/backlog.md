@@ -17,6 +17,10 @@
 - [x] B031 Add transient expiry for manual companion reactions.
 - [x] B032 Add repeated-action streak handling for manual interaction.
 - [x] B033 Surface interaction state in the debug overlay.
+- [x] B034 Extract companion reaction engine for transient cue scheduling.
+- [x] B035 Propagate manual reaction intensity into character animation.
+- [x] B036 Add local debug APK install/hash verification script.
+- [x] B037 Include git hash in CI debug APK artifact name.
 - [x] B001 Initialize Android project with Kotlin and Compose.
 - [x] B027 Add asset validation script and documentation check for app-owned GLB assets.
 - [x] B026 Polish debug overlay UI without changing placement or AR lifecycle.

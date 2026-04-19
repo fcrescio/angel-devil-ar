@@ -155,6 +155,30 @@ class DevilProceduralMotionTest {
         assertEquals(DevilRigPose(), pose)
     }
 
+    @Test
+    fun blockedPoseScalesTailMotionWithReactionIntensity() {
+        val low = motion.poseAt(
+            elapsedSeconds = 0.1f,
+            directive = CharacterAnimationDirective(
+                intent = CharacterAnimationIntent.Blocked,
+                intensity = 1,
+            ),
+        )
+        val high = motion.poseAt(
+            elapsedSeconds = 0.1f,
+            directive = CharacterAnimationDirective(
+                intent = CharacterAnimationIntent.Blocked,
+                intensity = 3,
+            ),
+        )
+
+        assertTrue(
+            kotlin.math.abs(high.rotationFor(DevilProceduralMotion.TailRootJoint)) >
+                kotlin.math.abs(low.rotationFor(DevilProceduralMotion.TailRootJoint)),
+        )
+        assertTrue(high.bodyScaleY < low.bodyScaleY)
+    }
+
     private fun DevilRigPose.rotationFor(jointIndex: Int): Float {
         return jointRotations.first { it.jointIndex == jointIndex }.degrees
     }

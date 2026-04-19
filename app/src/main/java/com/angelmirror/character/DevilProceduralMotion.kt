@@ -26,17 +26,28 @@ enum class DevilJointAxis {
 class DevilProceduralMotion {
     fun poseAt(
         elapsedSeconds: Float,
-        intent: CharacterAnimationIntent,
+        directive: CharacterAnimationDirective,
     ): DevilRigPose {
-        return when (intent) {
+        val intensity = directive.intensityScale()
+        return when (directive.intent) {
             CharacterAnimationIntent.Appearing -> appearing(elapsedSeconds)
             CharacterAnimationIntent.Idle -> idle(elapsedSeconds)
-            CharacterAnimationIntent.Greeting -> greeting(elapsedSeconds)
+            CharacterAnimationIntent.Greeting -> greeting(elapsedSeconds, intensity)
             CharacterAnimationIntent.Searching -> searching(elapsedSeconds)
-            CharacterAnimationIntent.Blocked -> blocked(elapsedSeconds)
-            CharacterAnimationIntent.Calming -> calming(elapsedSeconds)
+            CharacterAnimationIntent.Blocked -> blocked(elapsedSeconds, intensity)
+            CharacterAnimationIntent.Calming -> calming(elapsedSeconds, intensity)
             CharacterAnimationIntent.Paused -> DevilRigPose()
         }
+    }
+
+    fun poseAt(
+        elapsedSeconds: Float,
+        intent: CharacterAnimationIntent,
+    ): DevilRigPose {
+        return poseAt(
+            elapsedSeconds = elapsedSeconds,
+            directive = CharacterAnimationDirective(intent = intent),
+        )
     }
 
     private fun appearing(elapsedSeconds: Float): DevilRigPose {
@@ -90,7 +101,10 @@ class DevilProceduralMotion {
         )
     }
 
-    private fun greeting(elapsedSeconds: Float): DevilRigPose {
+    private fun greeting(
+        elapsedSeconds: Float,
+        intensity: Float,
+    ): DevilRigPose {
         val wave = sin(elapsedSeconds * TwoPi * 1.35f)
         val wingLift = smoothStep(0.65f + (wave * 0.35f))
         val tail = sin((elapsedSeconds * TwoPi * 1.15f) + 0.8f)
@@ -99,13 +113,13 @@ class DevilProceduralMotion {
             bodyScaleY = 1.04f + (wingLift * 0.012f),
             bodyScaleZ = 0.99f,
             jointRotations = listOf(
-                DevilJointRotation(RightWingRootJoint, DevilJointAxis.Z, 12.0f + (wingLift * 11.0f)),
-                DevilJointRotation(RightWingTipJoint, DevilJointAxis.Z, 7.0f + (wingLift * 9.0f)),
+                DevilJointRotation(RightWingRootJoint, DevilJointAxis.Z, 10.0f + (wingLift * 11.0f * intensity)),
+                DevilJointRotation(RightWingTipJoint, DevilJointAxis.Z, 6.0f + (wingLift * 9.0f * intensity)),
                 DevilJointRotation(LeftWingRootJoint, DevilJointAxis.Z, -5.0f - (wingLift * 3.0f)),
                 DevilJointRotation(LeftWingTipJoint, DevilJointAxis.Z, -3.5f - (wingLift * 2.0f)),
-                DevilJointRotation(TailRootJoint, DevilJointAxis.Z, tail * 8.0f),
-                DevilJointRotation(TailMidJoint, DevilJointAxis.Z, (tail * 5.0f) + (wingLift * 2.0f)),
-                DevilJointRotation(TailTipJoint, DevilJointAxis.Z, sin(elapsedSeconds * TwoPi * 2.1f) * 6.0f),
+                DevilJointRotation(TailRootJoint, DevilJointAxis.Z, tail * 7.0f * intensity),
+                DevilJointRotation(TailMidJoint, DevilJointAxis.Z, (tail * 4.5f * intensity) + (wingLift * 2.0f)),
+                DevilJointRotation(TailTipJoint, DevilJointAxis.Z, sin(elapsedSeconds * TwoPi * 2.1f) * 5.0f * intensity),
             ),
         )
     }
@@ -130,40 +144,48 @@ class DevilProceduralMotion {
         )
     }
 
-    private fun calming(elapsedSeconds: Float): DevilRigPose {
+    private fun calming(
+        elapsedSeconds: Float,
+        intensity: Float,
+    ): DevilRigPose {
         val breath = sin(elapsedSeconds * TwoPi * 0.42f)
         val tail = sin((elapsedSeconds * TwoPi * 0.35f) + 1.0f)
+        val settle = 1.0f / intensity
         return DevilRigPose(
             bodyScaleX = 1.0f,
-            bodyScaleY = 0.985f + (breath * 0.008f),
+            bodyScaleY = 0.985f - ((intensity - 1.0f) * 0.004f) + (breath * 0.008f * settle),
             bodyScaleZ = 1.0f,
             jointRotations = listOf(
-                DevilJointRotation(RightWingRootJoint, DevilJointAxis.Z, -13.0f + (breath * 1.6f)),
-                DevilJointRotation(RightWingTipJoint, DevilJointAxis.Z, -7.0f + (breath * 1.0f)),
-                DevilJointRotation(LeftWingRootJoint, DevilJointAxis.Z, 12.0f - (breath * 1.4f)),
-                DevilJointRotation(LeftWingTipJoint, DevilJointAxis.Z, 6.6f - (breath * 0.9f)),
-                DevilJointRotation(TailRootJoint, DevilJointAxis.Z, tail * 3.0f),
-                DevilJointRotation(TailMidJoint, DevilJointAxis.Z, tail * 2.0f),
-                DevilJointRotation(TailTipJoint, DevilJointAxis.Z, tail * 1.5f),
+                DevilJointRotation(RightWingRootJoint, DevilJointAxis.Z, -13.0f - ((intensity - 1.0f) * 2.0f) + (breath * 1.6f * settle)),
+                DevilJointRotation(RightWingTipJoint, DevilJointAxis.Z, -7.0f - ((intensity - 1.0f) * 1.4f) + (breath * 1.0f * settle)),
+                DevilJointRotation(LeftWingRootJoint, DevilJointAxis.Z, 12.0f + ((intensity - 1.0f) * 1.8f) - (breath * 1.4f * settle)),
+                DevilJointRotation(LeftWingTipJoint, DevilJointAxis.Z, 6.6f + ((intensity - 1.0f) * 1.2f) - (breath * 0.9f * settle)),
+                DevilJointRotation(TailRootJoint, DevilJointAxis.Z, tail * 3.0f * settle),
+                DevilJointRotation(TailMidJoint, DevilJointAxis.Z, tail * 2.0f * settle),
+                DevilJointRotation(TailTipJoint, DevilJointAxis.Z, tail * 1.5f * settle),
             ),
         )
     }
 
-    private fun blocked(elapsedSeconds: Float): DevilRigPose {
+    private fun blocked(
+        elapsedSeconds: Float,
+        intensity: Float,
+    ): DevilRigPose {
         val twitch = sin(elapsedSeconds * TwoPi * 2.4f)
         val tailSnap = sin((elapsedSeconds * TwoPi * 1.9f) + 0.7f)
+        val sharpSnap = sin((elapsedSeconds * TwoPi * 4.6f) + 0.2f)
         return DevilRigPose(
-            bodyScaleX = 1.01f,
-            bodyScaleY = 0.99f,
+            bodyScaleX = 1.01f + ((intensity - 1.0f) * 0.006f),
+            bodyScaleY = 0.99f - ((intensity - 1.0f) * 0.008f),
             bodyScaleZ = 1.0f,
             jointRotations = listOf(
-                DevilJointRotation(RightWingRootJoint, DevilJointAxis.Z, -8.0f + (twitch * 1.8f)),
-                DevilJointRotation(RightWingTipJoint, DevilJointAxis.Z, -5.0f + (twitch * 1.2f)),
-                DevilJointRotation(LeftWingRootJoint, DevilJointAxis.Z, 7.5f - (twitch * 1.6f)),
-                DevilJointRotation(LeftWingTipJoint, DevilJointAxis.Z, 4.8f - (twitch * 1.1f)),
-                DevilJointRotation(TailRootJoint, DevilJointAxis.Z, 5.5f + (tailSnap * 6.0f)),
-                DevilJointRotation(TailMidJoint, DevilJointAxis.Z, 3.0f + (tailSnap * 4.5f)),
-                DevilJointRotation(TailTipJoint, DevilJointAxis.Z, tailSnap * 6.0f),
+                DevilJointRotation(RightWingRootJoint, DevilJointAxis.Z, -8.0f + (twitch * 1.8f * intensity)),
+                DevilJointRotation(RightWingTipJoint, DevilJointAxis.Z, -5.0f + (twitch * 1.2f * intensity)),
+                DevilJointRotation(LeftWingRootJoint, DevilJointAxis.Z, 7.5f - (twitch * 1.6f * intensity)),
+                DevilJointRotation(LeftWingTipJoint, DevilJointAxis.Z, 4.8f - (twitch * 1.1f * intensity)),
+                DevilJointRotation(TailRootJoint, DevilJointAxis.Z, 5.5f + (tailSnap * 5.5f * intensity) + (sharpSnap * 2.0f * (intensity - 1.0f))),
+                DevilJointRotation(TailMidJoint, DevilJointAxis.Z, 3.0f + (tailSnap * 4.2f * intensity) + (sharpSnap * 1.5f * (intensity - 1.0f))),
+                DevilJointRotation(TailTipJoint, DevilJointAxis.Z, (tailSnap * 5.5f * intensity) + (sharpSnap * 2.2f * (intensity - 1.0f))),
             ),
         )
     }
@@ -206,6 +228,10 @@ class DevilProceduralMotion {
 
     private fun wrap01(value: Float): Float {
         return value - floor(value)
+    }
+
+    private fun CharacterAnimationDirective.intensityScale(): Float {
+        return 1.0f + ((clampedIntensity - 1) * 0.35f)
     }
 
     companion object {

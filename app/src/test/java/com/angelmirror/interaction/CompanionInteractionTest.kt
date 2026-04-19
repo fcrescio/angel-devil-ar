@@ -6,6 +6,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class CompanionInteractionTest {
+    private val engine = CompanionReactionEngine()
+
     @Test
     fun quickActionsExposeStableManualSignals() {
         val actions = CompanionActions.QuickActions
@@ -88,6 +90,47 @@ class CompanionInteractionTest {
         assertEquals(0, settled.manualActionStreak)
         assertEquals(null, settled.lastManualActionId)
         assertEquals(greeted.eventId + 1, settled.eventId)
+    }
+
+    @Test
+    fun reactionEngineReturnsExpiryForTransientCue() {
+        val result = engine.dispatch(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.UserProvoked,
+        )
+
+        assertEquals("provoked", result.state.cue.id)
+        assertEquals(result.state.eventId, result.expiry?.eventId)
+        assertEquals("provoked", result.expiry?.cueId)
+        assertEquals(2_800L, result.expiry?.delayMillis)
+    }
+
+    @Test
+    fun reactionEngineDoesNotScheduleExpiryForPersistentCue() {
+        val result = engine.dispatch(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.CharacterPlaced,
+        )
+
+        assertEquals(CompanionCues.Present, result.state.cue)
+        assertEquals(null, result.expiry)
+    }
+
+    @Test
+    fun arSignalInterruptsManualReactionAndClearsExpiry() {
+        val provoked = engine.dispatch(
+            current = CompanionInteractionState(),
+            signal = CompanionSignal.UserProvoked,
+        )
+
+        val searching = engine.dispatch(
+            current = provoked.state,
+            signal = CompanionSignal.FaceLost,
+        )
+
+        assertEquals(CompanionCues.FindFace, searching.state.cue)
+        assertEquals(0, searching.state.manualActionStreak)
+        assertEquals(null, searching.expiry)
     }
 
     @Test

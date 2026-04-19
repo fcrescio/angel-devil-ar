@@ -40,8 +40,19 @@ data class CompanionInteractionState(
                 append("streak: ")
                 append(manualActionStreak)
             }
-        }
+    }
 }
+
+data class CompanionReactionExpiry(
+    val eventId: Int,
+    val cueId: String,
+    val delayMillis: Long,
+)
+
+data class CompanionReactionResult(
+    val state: CompanionInteractionState,
+    val expiry: CompanionReactionExpiry? = null,
+)
 
 data class CompanionAction(
     val id: String,
@@ -63,6 +74,33 @@ sealed interface CompanionSignal {
     data class ArSessionFailed(
         val reason: String,
     ) : CompanionSignal
+}
+
+class CompanionReactionEngine(
+    private val reducer: CompanionInteractionReducer = CompanionInteractionReducer,
+) {
+    fun dispatch(
+        current: CompanionInteractionState,
+        signal: CompanionSignal,
+    ): CompanionReactionResult {
+        val next = reducer.reduce(
+            current = current,
+            signal = signal,
+        )
+        return CompanionReactionResult(
+            state = next,
+            expiry = expiryFor(next),
+        )
+    }
+
+    fun expiryFor(state: CompanionInteractionState): CompanionReactionExpiry? {
+        val durationMillis = state.cue.durationMillis ?: return null
+        return CompanionReactionExpiry(
+            eventId = state.eventId,
+            cueId = state.cue.id,
+            delayMillis = durationMillis,
+        )
+    }
 }
 
 object CompanionActions {

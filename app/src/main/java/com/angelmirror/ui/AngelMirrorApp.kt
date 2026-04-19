@@ -47,8 +47,9 @@ import com.angelmirror.character.CharacterAnimationIntentMapper
 import com.angelmirror.character.CharacterPlacementDebugState
 import com.angelmirror.interaction.CompanionAction
 import com.angelmirror.interaction.CompanionActions
-import com.angelmirror.interaction.CompanionInteractionReducer
 import com.angelmirror.interaction.CompanionInteractionState
+import com.angelmirror.interaction.CompanionReactionEngine
+import com.angelmirror.interaction.CompanionReactionExpiry
 import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.permissions.CameraPermissionChecker
 import com.angelmirror.permissions.CameraPermissionState
@@ -79,6 +80,12 @@ private fun ReadinessScreen() {
     var companionInteraction by remember {
         mutableStateOf(CompanionInteractionState())
     }
+    var companionReactionExpiry by remember {
+        mutableStateOf<CompanionReactionExpiry?>(null)
+    }
+    val companionReactionEngine = remember {
+        CompanionReactionEngine()
+    }
     var placementDebug by remember {
         mutableStateOf<CharacterPlacementDebugState?>(null)
     }
@@ -102,16 +109,19 @@ private fun ReadinessScreen() {
         arAvailability == ArAvailabilityState.Ready
 
     val applyCompanionSignal: (CompanionSignal) -> Unit = { signal ->
-        companionInteraction = CompanionInteractionReducer.reduce(
+        val result = companionReactionEngine.dispatch(
             current = companionInteraction,
             signal = signal,
         )
+        companionInteraction = result.state
+        companionReactionExpiry = result.expiry
     }
 
     if (isReadyForAr) {
         ArExperienceScreen(
             status = arSessionStatus,
             companionInteraction = companionInteraction,
+            companionReactionExpiry = companionReactionExpiry,
             placementDebug = placementDebug,
             onStatusChanged = {
                 arSessionStatus = it
@@ -160,6 +170,7 @@ private fun ReadinessScreen() {
 private fun ArExperienceScreen(
     status: ArSessionStatus,
     companionInteraction: CompanionInteractionState,
+    companionReactionExpiry: CompanionReactionExpiry?,
     placementDebug: CharacterPlacementDebugState?,
     onStatusChanged: (ArSessionStatus) -> Unit,
     onCompanionSignal: (CompanionSignal) -> Unit,
@@ -170,20 +181,23 @@ private fun ArExperienceScreen(
     }
     val companionCue = companionInteraction.cue
 
-    val animationIntent = remember(companionCue.mood) {
-        CharacterAnimationIntentMapper.fromMood(companionCue.mood)
+    val animationDirective = remember(
+        companionCue.mood,
+        companionInteraction.manualActionStreak,
+    ) {
+        CharacterAnimationIntentMapper.fromInteractionState(companionInteraction)
     }
 
-    LaunchedEffect(companionInteraction.eventId) {
-        val durationMillis = companionCue.durationMillis ?: return@LaunchedEffect
-        delay(durationMillis)
-        onCompanionSignal(CompanionSignal.CueExpired(companionCue.id))
+    LaunchedEffect(companionReactionExpiry) {
+        val expiry = companionReactionExpiry ?: return@LaunchedEffect
+        delay(expiry.delayMillis)
+        onCompanionSignal(CompanionSignal.CueExpired(expiry.cueId))
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         ArHostView(
             modifier = Modifier.fillMaxSize(),
-            animationIntent = animationIntent,
+            animationDirective = animationDirective,
             onStatusChanged = onStatusChanged,
             onPlacementDebugChanged = onPlacementDebugChanged,
         )
@@ -232,11 +246,16 @@ private fun ArExperienceScreen(
         ) {
             if (showDebug && placementDebug != null) {
                 val debugStateWithAnimation = placementDebug.copy(
-                    animationIntent = animationIntent,
+                    animationIntent = animationDirective.intent,
                 )
                 PlacementDebugOverlay(
                     modifier = Modifier.fillMaxWidth(),
-                    summary = debugStateWithAnimation.summary + "\n" + companionInteraction.summary,
+                    summary = debugStateWithAnimation.summary +
+                        "\n" +
+                        companionInteraction.summary +
+                        "\nexpiry: ${companionReactionExpiry?.delayMillis ?: "persistent"}" +
+                        "\nintensity: ${animationDirective.clampedIntensity}" +
+                        "\n${BuildInfo.DisplayBuild}",
                 )
             }
             CompanionActionBar(

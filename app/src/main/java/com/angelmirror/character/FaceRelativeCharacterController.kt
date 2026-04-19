@@ -21,7 +21,9 @@ class FaceRelativeCharacterController(
     private var firstAnimationTimestampNanos: Long? = null
     private val offset = profile.offset
 
-    var animationIntent: CharacterAnimationIntent = initialAnimationIntent
+    var animationDirective: CharacterAnimationDirective = CharacterAnimationDirective(
+        intent = initialAnimationIntent,
+    )
 
     fun update(frame: Frame): Boolean {
         val elapsedSeconds = animationElapsedSeconds(frame.timestamp)
@@ -48,7 +50,7 @@ class FaceRelativeCharacterController(
         val smoothed = smooth(target)
         val animationPose = animator.poseAt(
             elapsedSeconds = elapsedSeconds,
-            intent = animationIntent,
+            directive = animationDirective,
         )
 
         modelNode.position = Position(
@@ -73,7 +75,7 @@ class FaceRelativeCharacterController(
             offset = offset,
             latestPlacement = lastPlacement,
             tracking = tracking,
-            animationIntent = animationIntent,
+            animationIntent = animationDirective.intent,
         )
     }
 
@@ -87,7 +89,7 @@ class FaceRelativeCharacterController(
     private fun applyAssetAnimation(elapsedSeconds: Float) {
         assetAnimator.apply(
             elapsedSeconds = elapsedSeconds,
-            intent = animationIntent,
+            directive = animationDirective,
         )
     }
 
