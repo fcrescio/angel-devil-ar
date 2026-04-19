@@ -4,6 +4,12 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
+val gitShortSha = runCatching {
+    providers.exec {
+        commandLine("git", "rev-parse", "--short=7", "HEAD")
+    }.standardOutput.asText.get().trim()
+}.getOrDefault("unknown").ifBlank { "unknown" }
+
 android {
     namespace = "com.angelmirror"
     compileSdk = 35
@@ -22,7 +28,8 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "0.1.0"
+        versionName = "0.1.0+$gitShortSha"
+        buildConfigField("String", "GIT_SHORT_SHA", "\"$gitShortSha\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -48,6 +55,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

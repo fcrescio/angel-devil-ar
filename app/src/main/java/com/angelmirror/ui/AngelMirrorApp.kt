@@ -52,6 +52,7 @@ import com.angelmirror.interaction.CompanionInteractionState
 import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.permissions.CameraPermissionChecker
 import com.angelmirror.permissions.CameraPermissionState
+import com.angelmirror.util.BuildInfo
 import kotlinx.coroutines.delay
 
 @Composable
@@ -139,6 +140,10 @@ private fun ReadinessScreen() {
             text = readinessMessage(context, cameraPermission, arAvailability),
             style = MaterialTheme.typography.bodyLarge,
         )
+        BuildBadge(
+            modifier = Modifier.padding(top = 12.dp),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.64f),
+        )
         if (cameraPermission != CameraPermissionState.Granted) {
             Button(
                 onClick = {
@@ -204,6 +209,7 @@ private fun ArExperienceScreen(
                     color = Color.White.copy(alpha = 0.78f),
                     style = MaterialTheme.typography.bodySmall,
                 )
+                BuildBadge()
             }
             TextButton(
                 onClick = {
@@ -241,6 +247,19 @@ private fun ArExperienceScreen(
             )
         }
     }
+}
+
+@Composable
+private fun BuildBadge(
+    modifier: Modifier = Modifier,
+    color: Color = Color.White.copy(alpha = 0.64f),
+) {
+    Text(
+        modifier = modifier,
+        text = BuildInfo.DisplayBuild,
+        color = color,
+        style = MaterialTheme.typography.labelSmall,
+    )
 }
 
 @Composable

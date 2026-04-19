@@ -15,6 +15,7 @@ import com.angelmirror.interaction.CompanionInteractionState
 import com.angelmirror.interaction.CompanionMood
 import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.tracking.FacePose
+import com.angelmirror.util.BuildInfo
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -23,6 +24,13 @@ class BootstrapStatusTest {
     @Test
     fun bootstrapStatusHasReadableMessage() {
         assertTrue(BootstrapStatus.Ready.message.isNotBlank())
+    }
+
+    @Test
+    fun buildInfoIncludesGitIdentifier() {
+        assertTrue(BuildInfo.GitShortSha.isNotBlank())
+        assertTrue(BuildInfo.VersionName.contains(BuildInfo.GitShortSha))
+        assertEquals("build ${BuildInfo.GitShortSha}", BuildInfo.DisplayBuild)
     }
 
     @Test
