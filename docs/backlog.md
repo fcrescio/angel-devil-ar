@@ -21,6 +21,7 @@
 - [x] B035 Propagate manual reaction intensity into character animation.
 - [x] B036 Add local debug APK install/hash verification script.
 - [x] B037 Include git hash in CI debug APK artifact name.
+- [x] B038 Select explicit front camera config to reduce selfie crop.
 - [x] B001 Initialize Android project with Kotlin and Compose.
 - [x] B027 Add asset validation script and documentation check for app-owned GLB assets.
 - [x] B026 Polish debug overlay UI without changing placement or AR lifecycle.

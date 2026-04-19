@@ -40,6 +40,9 @@ fun ArHostView(
         ARSceneView(
             context = context,
             sessionFeatures = AugmentedFaceSessionConfig.FrontCameraFeatures,
+            sessionCameraConfig = { session ->
+                AugmentedFaceSessionConfig.selectCameraConfig(context, session)
+            },
             sessionConfiguration = AugmentedFaceSessionConfig::apply,
             onSessionCreated = {
                 onStatusChanged(ArSessionStatus.Creating)
