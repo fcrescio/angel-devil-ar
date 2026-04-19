@@ -5,6 +5,7 @@ import android.content.Context
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.Box
@@ -22,6 +23,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -29,10 +31,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,7 +58,11 @@ import com.angelmirror.interaction.CompanionReactionExpiry
 import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.permissions.CameraPermissionChecker
 import com.angelmirror.permissions.CameraPermissionState
+import com.angelmirror.permissions.MicrophonePermissionChecker
+import com.angelmirror.permissions.MicrophonePermissionState
 import com.angelmirror.util.BuildInfo
+import com.angelmirror.voice.AndroidVoiceCommandRecognizer
+import com.angelmirror.voice.VoiceRecognitionState
 import kotlinx.coroutines.delay
 
 @Composable
@@ -71,6 +79,9 @@ private fun ReadinessScreen() {
     val context = LocalContext.current
     var cameraPermission by remember {
         mutableStateOf(CameraPermissionChecker.check(context))
+    }
+    var microphonePermission by remember {
+        mutableStateOf(MicrophonePermissionChecker.check(context))
     }
     var arAvailability by remember {
         mutableStateOf(AndroidArAvailabilityChecker.check(context))
@@ -100,9 +111,19 @@ private fun ReadinessScreen() {
         }
         arAvailability = AndroidArAvailabilityChecker.check(context)
     }
+    val microphoneLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+    ) { granted ->
+        microphonePermission = if (granted) {
+            MicrophonePermissionState.Granted
+        } else {
+            MicrophonePermissionState.Denied
+        }
+    }
 
     LaunchedEffect(context) {
         cameraPermission = CameraPermissionChecker.check(context)
+        microphonePermission = MicrophonePermissionChecker.check(context)
         arAvailability = AndroidArAvailabilityChecker.check(context)
     }
 
@@ -123,12 +144,16 @@ private fun ReadinessScreen() {
             status = arSessionStatus,
             companionInteraction = companionInteraction,
             companionReactionExpiry = companionReactionExpiry,
+            microphonePermission = microphonePermission,
             placementDebug = placementDebug,
             onStatusChanged = {
                 arSessionStatus = it
                 it.toCompanionSignal()?.let(applyCompanionSignal)
             },
             onCompanionSignal = applyCompanionSignal,
+            onRequestMicrophonePermission = {
+                microphoneLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            },
             onPlacementDebugChanged = {
                 placementDebug = it
             },
@@ -172,13 +197,31 @@ private fun ArExperienceScreen(
     status: ArSessionStatus,
     companionInteraction: CompanionInteractionState,
     companionReactionExpiry: CompanionReactionExpiry?,
+    microphonePermission: MicrophonePermissionState,
     placementDebug: CharacterPlacementDebugState?,
     onStatusChanged: (ArSessionStatus) -> Unit,
     onCompanionSignal: (CompanionSignal) -> Unit,
+    onRequestMicrophonePermission: () -> Unit,
     onPlacementDebugChanged: (CharacterPlacementDebugState) -> Unit,
 ) {
+    val context = LocalContext.current
     var showDebug by remember {
         mutableStateOf(false)
+    }
+    var voiceState by remember {
+        mutableStateOf<VoiceRecognitionState>(VoiceRecognitionState.Idle)
+    }
+    val latestOnCompanionSignal = rememberUpdatedState(onCompanionSignal)
+    val voiceRecognizer = remember(context) {
+        AndroidVoiceCommandRecognizer(
+            context = context,
+            onStateChanged = { state ->
+                voiceState = state
+            },
+            onCommand = { signal ->
+                latestOnCompanionSignal.value(signal)
+            },
+        )
     }
     val companionCue = companionInteraction.cue
 
@@ -193,6 +236,12 @@ private fun ArExperienceScreen(
         val expiry = companionReactionExpiry ?: return@LaunchedEffect
         delay(expiry.delayMillis)
         onCompanionSignal(CompanionSignal.CueExpired(expiry.cueId))
+    }
+
+    DisposableEffect(voiceRecognizer) {
+        onDispose {
+            voiceRecognizer.destroy()
+        }
     }
 
     Box(
@@ -262,13 +311,29 @@ private fun ArExperienceScreen(
                         "\n" +
                         companionInteraction.summary +
                         "\nexpiry: ${companionReactionExpiry?.delayMillis ?: "persistent"}" +
+                        "\n${voiceState.summary}" +
                         "\nintensity: ${animationDirective.clampedIntensity}" +
                         "\npreview: camera aspect fit" +
                         "\n${BuildInfo.DisplayBuild}",
                 )
             }
+            if (voiceState != VoiceRecognitionState.Idle) {
+                VoiceStatusOverlay(
+                    modifier = Modifier.fillMaxWidth(),
+                    voiceState = voiceState,
+                )
+            }
             CompanionActionBar(
                 actions = CompanionActions.QuickActions,
+                microphonePermission = microphonePermission,
+                voiceState = voiceState,
+                onListen = {
+                    if (microphonePermission == MicrophonePermissionState.Granted) {
+                        voiceRecognizer.startListening()
+                    } else {
+                        onRequestMicrophonePermission()
+                    }
+                },
                 onAction = { action ->
                     onCompanionSignal(action.signal)
                 },
@@ -293,6 +358,9 @@ private fun BuildBadge(
 @Composable
 private fun CompanionActionBar(
     actions: List<CompanionAction>,
+    microphonePermission: MicrophonePermissionState,
+    voiceState: VoiceRecognitionState,
+    onListen: () -> Unit,
     onAction: (CompanionAction) -> Unit,
 ) {
     Row(
@@ -302,14 +370,23 @@ private fun CompanionActionBar(
                 color = Color.Black.copy(alpha = 0.62f),
                 shape = RoundedCornerShape(8.dp),
             )
+            .horizontalScroll(rememberScrollState())
             .padding(horizontal = 10.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Button(
+            enabled = voiceState != VoiceRecognitionState.Listening,
+            onClick = onListen,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF38624C),
+                contentColor = Color.White,
+            ),
+        ) {
+            Text(text = microphonePermission.listenButtonLabel(voiceState))
+        }
         actions.forEachIndexed { index, action ->
-            if (index > 0) {
-                Spacer(modifier = Modifier.width(8.dp))
-            }
+            Spacer(modifier = Modifier.width(8.dp))
             Button(
                 onClick = {
                     onAction(action)
@@ -322,6 +399,37 @@ private fun CompanionActionBar(
                 Text(text = action.label)
             }
         }
+    }
+}
+
+private fun MicrophonePermissionState.listenButtonLabel(
+    voiceState: VoiceRecognitionState,
+): String {
+    return when {
+        voiceState == VoiceRecognitionState.Listening -> "Listening"
+        this == MicrophonePermissionState.Granted -> "Listen"
+        else -> "Mic"
+    }
+}
+
+@Composable
+private fun VoiceStatusOverlay(
+    voiceState: VoiceRecognitionState,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .background(
+                color = Color.Black.copy(alpha = 0.62f),
+                shape = RoundedCornerShape(8.dp),
+            )
+            .padding(horizontal = 12.dp, vertical = 8.dp),
+    ) {
+        Text(
+            text = voiceState.summary,
+            color = Color.White.copy(alpha = 0.86f),
+            style = MaterialTheme.typography.bodySmall,
+        )
     }
 }
 

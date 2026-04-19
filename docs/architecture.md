@@ -72,6 +72,14 @@ applies those poses to the validated wing and tail joint subset. This remains a
 temporary asset-specific layer until the project has a curated rig with authored
 GLB animation clips.
 
+## Voice Input
+
+The first voice layer uses Android `SpeechRecognizer` locally as a command
+input surface. It does not add an LLM, TTS, backend, auth, analytics, or
+always-on wake word. `voice/VoiceCommandParser` maps recognized text candidates
+to the same `CompanionSignal` values used by manual quick actions, so speech and
+buttons share the existing interaction reducer and animation pipeline.
+
 ## Placement Baseline
 
 The current validated placement profile is `pixel7-ear-shoulder`:

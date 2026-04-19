@@ -9,6 +9,7 @@ import com.angelmirror.character.CharacterPresentationProfiles
 import com.angelmirror.character.ShoulderPlacementSolver
 import com.angelmirror.character.ShoulderPlacementOffset
 import com.angelmirror.ar.ArAvailabilityState
+import com.angelmirror.interaction.CompanionActions
 import com.angelmirror.interaction.CompanionCues
 import com.angelmirror.interaction.CompanionInteractionReducer
 import com.angelmirror.interaction.CompanionInteractionState
@@ -16,8 +17,10 @@ import com.angelmirror.interaction.CompanionMood
 import com.angelmirror.interaction.CompanionSignal
 import com.angelmirror.tracking.FacePose
 import com.angelmirror.util.BuildInfo
+import com.angelmirror.voice.VoiceCommandParser
 import org.junit.Assert.assertTrue
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class BootstrapStatusTest {
@@ -130,6 +133,37 @@ class BootstrapStatusTest {
         assertEquals("AR is paused.", state.cue.text)
         assertEquals(false, state.voiceInputEnabled)
         assertEquals(false, state.llmResponseEnabled)
+    }
+
+    @Test
+    fun voiceCommandParserMapsGreetingTextToCompanionSignal() {
+        val result = VoiceCommandParser.parse(listOf("ciao diavoletto"))
+
+        assertEquals(CompanionActions.Greet.id, result?.actionId)
+        assertEquals(CompanionSignal.UserGreeted, result?.signal)
+    }
+
+    @Test
+    fun voiceCommandParserMapsReassuranceTextToCompanionSignal() {
+        val result = VoiceCommandParser.parse(listOf("calmati adesso"))
+
+        assertEquals(CompanionActions.Reassure.id, result?.actionId)
+        assertEquals(CompanionSignal.UserReassured, result?.signal)
+    }
+
+    @Test
+    fun voiceCommandParserMapsProvocationTextToCompanionSignal() {
+        val result = VoiceCommandParser.parse(listOf("buh"))
+
+        assertEquals(CompanionActions.Provoke.id, result?.actionId)
+        assertEquals(CompanionSignal.UserProvoked, result?.signal)
+    }
+
+    @Test
+    fun voiceCommandParserIgnoresUnknownText() {
+        val result = VoiceCommandParser.parse(listOf("questa frase non e un comando"))
+
+        assertNull(result)
     }
 
     @Test
